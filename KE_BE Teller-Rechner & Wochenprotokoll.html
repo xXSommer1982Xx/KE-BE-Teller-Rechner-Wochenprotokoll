@@ -1,0 +1,2732 @@
+<!DOCTYPE html>
+<html lang="de" class="h-full bg-slate-100" id="html-root">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>KE/BE Teller-Rechner & Wochenprotokoll</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href='data:application/manifest+json,{"name":"KE/BE Rechner & Protokoll","short_name":"KE-Rechner","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#ffffff","orientation":"portrait","icons":[{"src":"data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"22\" fill=\"%234f46e5\"/><text x=\"50\" y=\"58\" font-family=\"sans-serif\" font-size=\"26\" font-weight=\"bold\" fill=\"white\" text-anchor=\"middle\">KE</text></svg>","sizes":"192x192 512x512","type":"image/svg+xml"}]}'>
+  <meta name="theme-color" content="#ffffff" id="meta-theme-color">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="KE-Rechner">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class'
+    }
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .font-mono-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-feature-settings: "tnum" 1;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-track { background: rgba(226, 232, 240, 0.6); border-radius: 999px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.8); border-radius: 999px; }
+
+    .dark .custom-scroll::-webkit-scrollbar-track { background: rgba(51, 65, 85, 0.6); }
+    .dark .custom-scroll::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, 0.8); }
+
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]:focus { outline: none; }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      height: 22px;
+      width: 22px;
+      border-radius: 50%;
+      background: #4f46e5;
+      border: 3px solid #ffffff;
+      cursor: pointer;
+      margin-top: -8px;
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.35);
+      transition: transform 0.1s ease;
+    }
+    .dark input[type=range]::-webkit-slider-thumb {
+      border: 3px solid #1e293b;
+      background: #6366f1;
+    }
+    input[type=range]:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+      background: #4338ca;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: #e2e8f0;
+      border-radius: 999px;
+    }
+    .dark input[type=range]::-webkit-slider-runnable-track {
+      background: #334155;
+    }
+
+    .food-grid-viewport-3 {
+      height: calc(100vh - 275px);
+      min-height: 320px;
+    }
+    #reader video {
+      object-fit: cover !important;
+      border-radius: 1rem !important;
+    }
+  </style>
+</head>
+<body class="h-full bg-slate-100 dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col justify-between overflow-hidden transition-colors duration-200">
+
+  <!-- ================= TOP APP HEADER & SETTINGS DROPDOWN ================= -->
+  <header class="w-full max-w-md mx-auto pt-2.5 px-4 pb-2.5 shrink-0 border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md z-30 shadow-sm flex items-center justify-between transition-colors duration-200">
+    <div class="flex items-center gap-2">
+      <div class="w-8 h-8 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-xs">
+        <i data-lucide="scale" class="w-4 h-4"></i>
+      </div>
+      <div>
+        <h1 id="ui-app-title" class="text-xs font-extrabold tracking-tight text-slate-900 dark:text-white uppercase leading-none">KE/BE Rechner</h1>
+        <span id="ui-app-sub" class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Mit Wochenprotokoll & OFF-Datenbank</span>
+      </div>
+    </div>
+
+    <!-- Settings Dropdown Menu -->
+    <div class="relative">
+      <button onclick="toggleSettingsDropdown(event)" id="btn-settings-toggle" class="w-8 h-8 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center justify-center active:scale-95 transition-all shadow-xs" title="Einstellungen">
+        <i data-lucide="settings" class="w-4 h-4"></i>
+      </button>
+      
+      <div id="settings-dropdown" class="hidden absolute right-0 mt-1.5 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-2 px-2.5 z-50 flex flex-col gap-2.5 transition-colors duration-200">
+        
+        <button onclick="openOnboardingManual()" class="w-full px-2 py-1.5 text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-200 rounded-xl border-b border-slate-100 dark:border-slate-800 pb-2">
+          <i data-lucide="help-circle" class="w-3.5 h-3.5 text-indigo-500"></i>
+          <span id="ui-menu-tutorial">Anleitung & Hilfe</span>
+        </button>
+
+        <button onclick="openAboutModal()" class="w-full px-2 py-1.5 text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors text-slate-700 dark:text-slate-200 rounded-xl border-b border-slate-100 dark:border-slate-800 pb-2">
+          <i data-lucide="info" class="w-3.5 h-3.5 text-indigo-500"></i>
+          <span id="ui-menu-about">Über diese App / Impressum</span>
+        </button>
+
+        <!-- 1. Retention Section (Dropdown) -->
+        <div class="flex flex-col gap-1">
+          <label id="ui-dropdown-retention" class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5 px-0.5">
+            <i data-lucide="history" class="w-3 h-3 text-indigo-500"></i>
+            <span>Protokoll-Speicherung</span>
+          </label>
+          <select id="retention-select" onchange="setRetention(this.value)" class="w-full h-8 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+            <option value="1y" id="ui-ret-1y">1 Jahr</option>
+            <option value="6m" id="ui-ret-6m">6 Monate</option>
+            <option value="1m" id="ui-ret-1m">1 Monat</option>
+            <option value="1w" id="ui-ret-1w">1 Woche</option>
+            <option value="current" id="ui-ret-curr">Nur aktuelle Woche</option>
+          </select>
+        </div>
+
+        <!-- 2. Display Section (Dropdown) -->
+        <div class="flex flex-col gap-1">
+          <label id="ui-dropdown-display" class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5 px-0.5">
+            <i data-lucide="sun-moon" class="w-3 h-3 text-indigo-500"></i>
+            <span>Display</span>
+          </label>
+          <select id="theme-select" onchange="setDisplayMode(this.value)" class="w-full h-8 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+            <option value="light" id="ui-theme-light-lbl">Hell</option>
+            <option value="dark" id="ui-theme-dark-lbl">Dunkel</option>
+          </select>
+        </div>
+
+        <!-- 3. Language Section (Dropdown) -->
+        <div class="flex flex-col gap-1">
+          <label id="ui-dropdown-title" class="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5 px-0.5">
+            <i data-lucide="globe" class="w-3 h-3 text-indigo-500"></i>
+            <span>Sprache</span>
+          </label>
+          <select id="language-select" onchange="selectLangFromDropdown(this.value)" class="w-full h-8 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 transition-colors">
+            <option value="de">🇩🇪 Deutsch</option>
+            <option value="en">🇬🇧 English</option>
+            <option value="zh">🇨🇳 中文</option>
+            <option value="es">🇪🇸 Español</option>
+          </select>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT VIEWS (3 PAGES) ================= -->
+  <div class="flex-1 max-w-md mx-auto w-full flex flex-col overflow-hidden relative pb-16">
+    
+    <!-- PAGE 1: DATABASE & SEARCH -->
+    <div id="tab-db" class="flex-1 flex flex-col overflow-hidden p-4 gap-2.5">
+      <!-- Categories with item counts (Favoriten at 2nd position) -->
+      <div id="category-bar" class="flex gap-1.5 overflow-x-auto no-scrollbar py-0.5 shrink-0"></div>
+
+      <!-- New button & Search -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="openEditModal(null)" class="h-9 px-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900 active:scale-95 transition-all flex items-center gap-1.5 text-xs font-semibold shrink-0">
+          <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+          <span id="ui-btn-new">Neu</span>
+        </button>
+        <div class="relative flex-1">
+          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"></i>
+          <input type="text" id="search-input" placeholder="Lebensmittel suchen..." oninput="onSearchInput(this.value)" class="w-full h-9 pl-8 pr-7 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 shadow-sm transition-colors">
+          <button onclick="clearSearch()" id="btn-clear-search" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+            <i data-lucide="x" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Barcode Scanner Button & Reader Container -->
+      <div class="flex flex-col gap-1 shrink-0">
+        <button onclick="starteKameraScanner()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition-all flex items-center justify-center gap-2">
+          <span>📷</span>
+          <span id="ui-btn-scan-lbl">Barcode scannen</span>
+        </button>
+        <div id="reader" style="width: 100%; max-width: 400px; margin-top: 4px; display: none;" class="overflow-hidden rounded-2xl bg-slate-950 border border-slate-200 dark:border-slate-800 shadow-md"></div>
+      </div>
+
+      <!-- Food Grid Box -->
+      <div class="food-grid-viewport-3 bg-slate-200/50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-2 overflow-y-auto custom-scroll transition-colors">
+        <div id="food-grid" class="grid grid-cols-2 gap-2"></div>
+      </div>
+    </div>
+
+    <!-- PAGE 2: PLATE CALCULATOR & TELLERFAVORITEN -->
+    <div id="tab-plate" class="hidden flex-1 flex flex-col overflow-y-auto custom-scroll p-4 gap-3">
+      
+      <!-- Plate Header & Action Buttons -->
+      <div class="flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="utensils" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+            <span id="ui-my-plate">Mein Teller</span>
+          </span>
+          <span id="plate-count-badge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-mono-num">0</span>
+        </div>
+        
+        <div class="flex items-center gap-1.5">
+          <button onclick="openSavePlateModal()" id="btn-save-plate-fav" class="hidden text-xs font-bold text-amber-600 dark:text-amber-400 hover:text-amber-800 flex items-center gap-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800/80 px-2.5 py-1.5 rounded-xl active:scale-95 transition-all shadow-xs" title="Teller als Favorit speichern">
+            <i data-lucide="bookmark-plus" class="w-3.5 h-3.5"></i>
+            <span id="ui-save-fav-btn">Speichern</span>
+          </button>
+          <button onclick="transferPlateToLog()" id="btn-transfer-log" class="hidden text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 px-2.5 py-1.5 rounded-xl active:scale-95 transition-all shadow-xs">
+            <i data-lucide="clipboard-copy" class="w-3.5 h-3.5"></i>
+            <span id="ui-to-plan">In Plan</span>
+          </button>
+          <button onclick="clearPlate()" id="btn-clear-plate" class="text-xs font-medium text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors hidden px-1.5 py-1">
+            <span id="ui-clear-plate">Leeren</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Plate Items List -->
+      <div id="plate-list" class="flex flex-col gap-2.5"></div>
+
+      <!-- Cockpit Summary -->
+      <div class="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm shrink-0 transition-colors">
+        <div class="grid grid-cols-4 gap-1 text-center">
+          <div class="border-r border-slate-200/80 dark:border-slate-800">
+            <span id="ui-lbl-amount" class="text-[9px] uppercase font-semibold text-slate-400 dark:text-slate-500 block mb-0.5">Menge</span>
+            <span id="stat-total-amount" class="text-xs font-bold text-slate-800 dark:text-slate-100 font-mono-num">0</span>
+          </div>
+          <div class="border-r border-slate-200/80 dark:border-slate-800">
+            <span id="ui-lbl-kh" class="text-[9px] uppercase font-semibold text-slate-400 dark:text-slate-500 block mb-0.5">KH</span>
+            <span id="stat-total-kh" class="text-xs font-bold text-slate-800 dark:text-slate-100 font-mono-num">0.0 g</span>
+          </div>
+          <div class="border-r border-slate-200/80 dark:border-slate-800">
+            <span id="ui-lbl-ke" class="text-[9px] uppercase font-semibold text-indigo-600 dark:text-indigo-400 block mb-0.5">KE (10g)</span>
+            <span id="stat-ke" class="text-xs font-extrabold text-indigo-600 font-mono-num">0.0</span>
+          </div>
+          <div>
+            <span id="ui-lbl-be" class="text-[9px] uppercase font-semibold text-slate-600 dark:text-slate-400 block mb-0.5">BE (12g)</span>
+            <span id="stat-be" class="text-xs font-bold text-slate-700 dark:text-slate-200 font-mono-num">0.0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELLERFAVORITEN (Saved Plate Favorites Section) -->
+      <div class="mt-2 pt-3 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 flex items-center gap-1.5">
+            <i data-lucide="bookmark" class="w-4 h-4 text-amber-500"></i>
+            <span id="ui-saved-plates-title">Tellerfavoriten (Gespeicherte Teller)</span>
+          </span>
+          <span id="saved-plates-count" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 font-mono-num">0</span>
+        </div>
+
+        <div id="saved-plates-grid" class="flex flex-col gap-2"></div>
+      </div>
+
+    </div>
+
+    <!-- PAGE 3: WEEKLY LOG -->
+    <div id="tab-plan" class="hidden flex-1 flex flex-col overflow-y-auto custom-scroll p-4 gap-3">
+      <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 shadow-xs flex flex-col gap-2.5 transition-colors">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="calendar" class="w-4 h-4 text-indigo-600 dark:text-indigo-400"></i>
+            <span id="ui-week-plan-title" class="text-xs font-bold text-slate-900 dark:text-white uppercase">Wochenprotokoll</span>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <button onclick="setTodayWeek()" class="px-2 py-1 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 text-xs font-semibold flex items-center gap-1 transition-colors" title="Aktuelle Woche setzen">
+              <i data-lucide="calendar-days" class="w-3.5 h-3.5"></i>
+              <span id="ui-btn-current-week">Aktuelle Woche</span>
+            </button>
+            <button onclick="printOrExportPlan()" class="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-300 hover:text-indigo-600 text-xs font-medium flex items-center gap-1 transition-colors" title="Drucken">
+              <i data-lucide="printer" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="resetWholeWeek()" class="p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950 text-slate-400 hover:text-rose-600 text-xs transition-colors" title="Woche leeren">
+              <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="navigateWeek(-1)" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-300 hover:text-indigo-600 flex items-center justify-center shrink-0 transition-colors" title="Vorherige Woche">
+            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+          </button>
+          <div class="grid grid-cols-2 gap-2 text-xs flex-1">
+            <div>
+              <label id="ui-week-from" class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block">Woche von:</label>
+              <input type="date" id="week-start-date" onchange="onDateInputChange()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-1 text-xs text-slate-700 dark:text-slate-200 font-mono-num focus:outline-none focus:border-indigo-500 transition-colors">
+            </div>
+            <div>
+              <label id="ui-week-to" class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block">bis:</label>
+              <input type="date" id="week-end-date" onchange="onDateInputChange()" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-1 text-xs text-slate-700 dark:text-slate-200 font-mono-num focus:outline-none focus:border-indigo-500 transition-colors">
+            </div>
+          </div>
+          <button onclick="navigateWeek(1)" class="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950 text-slate-600 dark:text-slate-300 hover:text-indigo-600 flex items-center justify-center shrink-0 transition-colors" title="Nächste Woche">
+            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="days-container" class="flex flex-col gap-3 pb-6"></div>
+    </div>
+
+  </div>
+
+  <!-- ================= FIXED BOTTOM NAVIGATION BAR ================= -->
+  <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 z-30 shadow-2xl flex items-center justify-around py-2 px-3 transition-colors duration-200">
+    <button onclick="switchTab('tab-db')" id="nav-btn-db" class="flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all text-indigo-600 dark:text-indigo-400 font-bold">
+      <i data-lucide="book-open" class="w-5 h-5"></i>
+      <span class="text-[10px] tracking-tight uppercase" id="nav-lbl-db">Datenbank</span>
+    </button>
+    <button onclick="switchTab('tab-plate')" id="nav-btn-plate" class="flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 relative">
+      <div class="relative">
+        <i data-lucide="utensils" class="w-5 h-5"></i>
+        <span id="nav-plate-badge" class="hidden absolute -top-1.5 -right-2 px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-indigo-600 text-white font-mono-num">0</span>
+      </div>
+      <span class="text-[10px] tracking-tight uppercase" id="nav-lbl-plate">Teller</span>
+    </button>
+    <button onclick="switchTab('tab-plan')" id="nav-btn-plan" class="flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300">
+      <i data-lucide="calendar" class="w-5 h-5"></i>
+      <span class="text-[10px] tracking-tight uppercase" id="nav-lbl-plan">Wochenplan</span>
+    </button>
+  </nav>
+
+  <!-- ================= MODAL: EDIT / NEW FOOD ================= -->
+  <div id="edit-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-4 transition-colors">
+      <div class="flex items-center justify-between">
+        <h3 id="modal-title" class="text-sm font-bold text-slate-900 dark:text-white">Lebensmittel anpassen</h3>
+        <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div>
+          <label id="ui-lbl-foodname" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Name</label>
+          <input type="text" id="modal-name" class="w-full h-9 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label id="ui-lbl-category" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Kategorie</label>
+            <select id="modal-category" class="w-full h-9 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500"></select>
+          </div>
+          <div>
+            <label id="ui-lbl-unit" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Einheit</label>
+            <select id="modal-unit" class="w-full h-9 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+              <option value="g" id="ui-opt-g">Gramm (g)</option>
+              <option value="ml" id="ui-opt-ml">Milliliter (ml)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <div>
+            <label id="ui-lbl-kh100" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">KH / 100g/ml</label>
+            <input type="number" step="0.1" id="modal-kh" class="w-full h-9 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono-num text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+          <div>
+            <label id="ui-lbl-stdportion" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Standard Portion</label>
+            <input type="number" id="modal-portion" class="w-full h-9 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono-num text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+          </div>
+        </div>
+
+        <div>
+          <label id="ui-lbl-speed" class="text-[11px] font-medium text-slate-500 dark:text-slate-400 block mb-1">Resonanzgeschwindigkeit</label>
+          <select id="modal-speed" class="w-full h-9 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+            <option value="schnell">⚡ Schnell (z.B. Traubenzucker, Cola, Süßigkeiten)</option>
+            <option value="mittel">⏱️ Mittel (z.B. Obst, Nudeln, Reis, Brot)</option>
+            <option value="langsam">🐢 Langsam (z.B. Vollkorn, Ballaststoffe, Fett/Protein)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="deleteFoodFromModal()" id="btn-modal-delete" class="px-3 h-9 rounded-xl bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400 hover:bg-rose-100 text-xs font-semibold">Löschen</button>
+        <div class="flex items-center gap-2">
+          <button onclick="closeEditModal()" id="ui-btn-cancel" class="px-3 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold">Abbrechen</button>
+          <button onclick="saveFoodModal()" id="ui-btn-save" class="px-4 h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700">Speichern</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: SAVE PLATE FAVORITE ================= -->
+  <div id="save-plate-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-3 transition-colors">
+      <div class="flex items-center justify-between">
+        <h3 id="ui-save-plate-modal-title" class="text-xs font-bold text-slate-900 dark:text-white uppercase">Tellerfavorit speichern</h3>
+        <button onclick="closeSavePlateModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div>
+        <label id="ui-save-plate-lbl" class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block mb-1">Name für diesen Teller:</label>
+        <input type="text" id="plate-name-input" placeholder="z.B. Mein Standard-Frühstück" class="w-full h-9 px-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs text-slate-900 dark:text-slate-100 focus:outline-none focus:border-indigo-500">
+      </div>
+
+      <button onclick="executeSavePlateFavorite()" id="ui-save-plate-submit" class="w-full h-9 rounded-xl bg-amber-600 text-white font-bold text-xs hover:bg-amber-700 active:scale-95 transition-all mt-1">
+        Speichern
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: TRANSFER TO LOG ================= -->
+  <div id="transfer-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-3 transition-colors">
+      <div class="flex items-center justify-between">
+        <h3 id="ui-transfer-title" class="text-xs font-bold text-slate-900 dark:text-white">In Plan eintragen</h3>
+        <button onclick="closeTransferModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <p class="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+        <span id="ui-transfer-plate-lbl">Aktueller Teller:</span> <b id="transfer-ke-preview" class="text-indigo-600 dark:text-indigo-400">0.0 KE / BE</b>
+      </p>
+
+      <div>
+        <label id="ui-transfer-select-day" class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block mb-1">Tag auswählen</label>
+        <select id="transfer-day-select" class="w-full h-8 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500"></select>
+      </div>
+
+      <div>
+        <label id="ui-transfer-select-meal" class="text-[10px] text-slate-400 dark:text-slate-500 font-semibold block mb-1">Mahlzeit auswählen</label>
+        <select id="transfer-slot-select" class="w-full h-8 px-2 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-medium text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500">
+          <option value="0">1</option>
+          <option value="1">2</option>
+          <option value="2">3</option>
+          <option value="3">4</option>
+          <option value="4">5</option>
+          <option value="5">6</option>
+          <option value="6">7</option>
+        </select>
+      </div>
+
+      <button onclick="executeTransfer()" id="ui-btn-apply-transfer" class="w-full h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 active:scale-95 transition-all mt-1">
+        Übernehmen
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= ONBOARDING / TUTORIAL MODAL ================= -->
+  <div id="onboarding-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-5 transition-colors">
+      
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-1" id="onboarding-dots"></div>
+        <button onclick="closeOnboarding()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div id="onboarding-content" class="flex flex-col items-center text-center gap-3 py-2"></div>
+
+      <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+        <button onclick="prevOnboardingStep()" id="btn-onb-prev" class="px-3 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold invisible">Zurück</button>
+        <button onclick="nextOnboardingStep()" id="btn-onb-next" class="px-5 h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 active:scale-95 transition-all">Weiter</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= DELETION TUTORIAL MODAL (FIRST USE) ================= -->
+  <div id="del-tutorial-modal" class="hidden fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col gap-4 transition-colors">
+      <div class="w-12 h-12 rounded-2xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800/60 flex items-center justify-center text-rose-600 dark:text-rose-400 shadow-sm mx-auto">
+        <i data-lucide="trash-2" class="w-6 h-6"></i>
+      </div>
+      <h3 id="ui-del-tut-title" class="text-sm font-bold text-slate-900 dark:text-white text-center">Lösch-Geste entdeckt!</h3>
+      <p id="ui-del-tut-desc" class="text-xs text-slate-600 dark:text-slate-300 text-center leading-relaxed">
+        Du hast ein Lebensmittel 1 Sekunde lang gedrückt gehalten. So kannst du selbst hinzugefügte oder gescannte Lebensmittel ganz einfach aus der Liste löschen.
+      </p>
+      <button onclick="closeDelTutorial()" id="ui-del-tut-btn" class="w-full h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 active:scale-95 transition-all mt-1">
+        Verstanden
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ABOUT / IMPRESSUM ================= -->
+  <div id="about-modal" class="hidden fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm max-h-[85vh] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-4 transition-colors">
+      <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-7 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+          </div>
+          <h3 id="ui-about-title" class="text-xs font-bold text-slate-900 dark:text-white uppercase">Über diese App & Impressum</h3>
+        </div>
+        <button onclick="closeAboutModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto custom-scroll flex flex-col gap-3 pr-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+        <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+          <span class="font-bold text-slate-800 dark:text-slate-100" id="ui-about-appname">KE/BE Teller-Rechner & Wochenprotokoll</span>
+          <span class="text-[10px] font-mono-num font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">v4.9 PWA</span>
+        </div>
+
+        <p id="ui-about-desc">Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung, Blutzuckerdokumentation und Tellerfavoriten-Verwaltung.</p>
+
+        <div>
+          <span class="font-bold text-slate-800 dark:text-slate-100 block mb-1" id="ui-about-features-lbl">Hauptfunktionen:</span>
+          <p id="ui-about-features">Umfassende OFF-Datenbank mit reinen Markenprodukten & Klassikern (Milka, Nutella, Haribo, Alpro, Philadelphia, McDonald's, Burger King, Subway u.v.m.), Live-Barcode-Scanner, Favoriten an 2. Stelle, Tellerfavoriten (Gespeicherte Teller) und fortlaufendem Wochenprotokoll.</p>
+        </div>
+
+        <div>
+          <span class="font-bold text-slate-800 dark:text-slate-100 block mb-1" id="ui-about-sources-lbl">Datenquellen & Lizenzen:</span>
+          <p id="ui-about-sources">Produktdaten & Barcodes: Bereitgestellt durch Open Food Facts (Community-Datenbank). Lizenziert unter der Open Database License (ODbL). Die Mitwirkenden von Open Food Facts werden dankbar erwähnt.</p>
+        </div>
+
+        <div>
+          <span class="font-bold text-slate-800 dark:text-slate-100 block mb-1" id="ui-about-privacy-lbl">Datenschutz:</span>
+          <p id="ui-about-privacy">Alle Daten werden ausschließlich lokal auf Ihrem Endgerät im Browser (localStorage) gespeichert. Es findet keine Übertragung an externe Server statt (außer dem optionalen Abruf von Produktdaten beim Barcode-Scan über Open Food Facts).</p>
+        </div>
+
+        <div class="p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 text-amber-900 dark:text-amber-200 text-[11px] flex flex-col gap-1.5">
+          <span class="font-bold uppercase tracking-wide text-[10px] flex items-center gap-1">
+            <i data-lucide="alert-triangle" class="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0"></i>
+            <span id="ui-about-disclaimer-title">Medizinischer Haftungsausschluss</span>
+          </span>
+          <p id="ui-about-disclaimer" class="leading-snug">Diese App dient ausschließlich zu Informations- und Dokumentationszwecken und ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung durch einen Arzt oder Diabetesberater. Berechnungen für Insulin (Bolus/Basal) und Kohlenhydrate müssen stets eigenverantwortlich geprüft werden. Der Entwickler übernimmt keine Haftung für Therapieentscheidungen oder gesundheitliche Schäden.</p>
+        </div>
+      </div>
+
+      <button onclick="closeAboutModal()" class="w-full h-9 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700 active:scale-95 transition-all mt-1" id="ui-about-close">
+        Schließen
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= CUSTOM DIALOG MODAL ================= -->
+  <div id="custom-dialog" class="hidden fixed inset-0 z-50 bg-slate-900/40 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-5 shadow-2xl flex flex-col gap-3 transition-colors">
+      <h3 id="dialog-title-text" class="text-xs font-bold text-slate-900 dark:text-white uppercase">Hinweis</h3>
+      <p id="dialog-message-text" class="text-xs text-slate-600 dark:text-slate-300 leading-snug">Nachricht...</p>
+      <div id="dialog-buttons" class="flex items-center justify-end gap-2 pt-2"></div>
+    </div>
+  </div>
+
+  <!-- ================= APP SCRIPT ================= -->
+  <script>
+    let currentLang = 'de';
+    try {
+      const savedLang = localStorage.getItem('ke_lang');
+      if (['de', 'en', 'zh', 'es'].includes(savedLang)) {
+        currentLang = savedLang;
+      }
+    } catch(e) {}
+
+    let currentTheme = 'light';
+    try {
+      const savedTheme = localStorage.getItem('ke_theme');
+      if (savedTheme) currentTheme = savedTheme;
+    } catch(e) {}
+
+    let currentRetention = '1y';
+    try {
+      const savedRet = localStorage.getItem('ke_retention');
+      if (savedRet) currentRetention = savedRet;
+    } catch(e) {}
+
+    let lastTransferredSlot = null;
+    let currentOnbStep = 0;
+    let html5QrCode = null;
+    let longPressTimer = null;
+    let pendingDeleteFoodId = null;
+    let savedPlates = [];
+
+    const I18N = {
+      de: {
+        appTitle: "KE/BE Rechner",
+        appSub: "Mit Wochenprotokoll & OFF-Datenbank",
+        tabDb: "Datenbank",
+        tabPlate: "Teller",
+        tabPlan: "Wochenplan",
+        btnNew: "Neu",
+        searchPlaceholder: "Lebensmittel suchen...",
+        myPlate: "Mein Teller",
+        toPlan: "In Plan",
+        clear: "Leeren",
+        emptyPlate: "Dein Teller ist noch leer.",
+        tapHint: "Tippe in der Datenbank ein Lebensmittel an, um es hier hinzuzufügen.",
+        lblAmount: "Menge",
+        lblKh: "KH",
+        lblKe: "KE (10g)",
+        lblBe: "BE (12g)",
+        lblKhG: "KH (g)",
+        weekPlan: "Wochenprotokoll",
+        btnPrint: "Druck",
+        btnCurrentWeek: "Aktuelle Woche",
+        weekFrom: "Woche von:",
+        weekTo: "bis:",
+        today: "Heute",
+        workday: "Arbeitstag",
+        vacation: "Urlaub / Frei",
+        notePlaceholder: "Notiz / Bemerkungen (z.B. Sport, Krankheit...)",
+        mealHeader: "Mahlzeit",
+        rowTime: "Uhrzeit",
+        rowBz: "BZ",
+        rowKh: "KH (g)",
+        rowBe: "BE/KHE",
+        rowBolus: "Bolus-E",
+        rowBasal: "Basal-E",
+        modalEditTitle: "Lebensmittel anpassen",
+        modalNewTitle: "Neues Lebensmittel",
+        lblFoodName: "Name",
+        lblCategory: "Kategorie",
+        lblUnit: "Einheit",
+        unitGramm: "Gramm (g)",
+        unitMl: "Milliliter (ml)",
+        lblKh100: "KH / 100g/ml",
+        lblStandardPortion: "Standard Portion",
+        btnDelete: "Löschen",
+        btnCancel: "Abbrechen",
+        btnSave: "Speichern",
+        transferModalTitle: "In Plan eintragen",
+        transferPlatePreview: "Aktueller Teller:",
+        selectDay: "Tag auswählen",
+        selectMeal: "Mahlzeit auswählen",
+        btnApply: "Übernehmen",
+        confirmResetWeek: "Möchtest du das gesamte Wochenprotokoll wirklich leeren?",
+        confirmDeleteFood: "Möchtest du dieses Lebensmittel wirklich löschen?",
+        validationAlert: "Bitte mindestens einen Namen und den KH-Gehalt angeben.",
+        noFoodsFound: "Keine Lebensmittel gefunden.",
+        themeTitle: "Display",
+        themeLight: "Hell",
+        themeDark: "Dunkel",
+        menuTutorial: "Anleitung & Hilfe",
+        menuAbout: "Über diese App / Impressum",
+        retentionTitle: "Protokoll-Speicherung",
+        ret1y: "1 Jahr",
+        ret6m: "6 Monate",
+        ret1m: "1 Monat",
+        ret1w: "1 Woche",
+        retCurr: "Nur aktuelle Woche",
+        scanBtn: "Barcode scannen",
+        scanError: "Kamera konnte nicht gestartet werden",
+        offNotFound: "Produkt mit diesem Barcode wurde bei Open Food Facts nicht gefunden.",
+        netError: "Keine Internetverbindung oder Fehler beim Abrufen.",
+        camError: "Kamera konnte nicht gestartet werden (Erlaubnis verweigert oder kein HTTPS/Localhost)",
+        savedPlatesTitle: "Tellerfavoriten (Gespeicherte Teller)",
+        saveFavBtn: "Speichern",
+        savePlateModalTitle: "Tellerfavorit speichern",
+        savePlateLbl: "Name für diesen Teller:",
+        emptySavedPlates: "Keine gespeicherten Tellerfavoriten vorhanden.",
+        loadPlate: "Laden",
+        confirmDeletePlateFav: "Möchtest du diesen Tellerfavoriten wirklich löschen?",
+        plateSavedMsg: "Tellerfavorit erfolgreich gespeichert!",
+        aboutTitle: "Über diese App & Impressum",
+        aboutAppName: "KE/BE Teller-Rechner & Wochenprotokoll",
+        aboutDesc: "Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung und Blutzuckerdokumentation.",
+        aboutFeaturesLbl: "Hauptfunktionen:",
+        aboutFeatures: "Umfassende OFF-Datenbank mit sauberen Markenprodukten, Fastfood, Wurst-, Milch- und Backwaren, Favoriten an 2. Stelle, Tellerfavoriten und Wochenprotokoll.",
+        aboutSourcesLbl: "Datenquellen & Lizenzen:",
+        aboutSources: "Produktdaten & Barcodes: Bereitgestellt durch Open Food Facts (Community-Datenbank). Lizenziert unter der Open Database License (ODbL).",
+        aboutPrivacyLbl: "Datenschutz:",
+        aboutPrivacy: "Alle Daten werden ausschließlich lokal auf Ihrem Endgerät im Browser (localStorage) gespeichert.",
+        aboutDisclaimerTitle: "Medizinischer Haftungsausschluss",
+        aboutDisclaimer: "Diese App dient ausschließlich zu Informations- und Dokumentationszwecken und ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung durch einen Arzt oder Diabetesberater. Berechnungen für Insulin (Bolus/Basal) und Kohlenhydrate müssen stets eigenverantwortlich geprüft werden. Der Entwickler übernimmt keine Haftung für Therapieentscheidungen oder gesundheitliche Schäden.",
+        aboutClose: "Schließen",
+        delTutTitle: "Lösch-Geste entdeckt!",
+        delTutDesc: "Du hast ein Lebensmittel 1 Sekunde lang gedrückt gehalten. So kannst du selbst hinzugefügte oder gescannte Lebensmittel ganz einfach aus der Liste löschen.",
+        delTutBtn: "Verstanden",
+        onbSteps: [
+          {
+            icon: "book-open",
+            title: "1. Datenbank & Favoriten",
+            desc: "Durchsuche hunderte Lebensmittel. Markiere Favoriten mit dem Stern, um sie direkt in der 2. Kategorie zu finden."
+          },
+          {
+            icon: "utensils",
+            title: "2. Teller & Tellerfavoriten",
+            desc: "Verwalte deinen Teller, speichere häufige Kombinationen als 'Tellerfavoriten' ab und lade sie mit einem Klick."
+          },
+          {
+            icon: "trash-2",
+            title: "3. Lebensmittel löschen",
+            desc: "Halte ein eigenes oder gescanntes Lebensmittel 1 Sekunde lang gedrückt, um es aus der Datenbank zu löschen."
+          },
+          {
+            icon: "calendar",
+            title: "4. Wochenplan & Protokoll",
+            desc: "Dokumentiere Blutzucker, KE/BE und Insulingaben im fortlaufenden Wochenprotokoll."
+          }
+        ],
+        onbPrev: "Zurück",
+        onbNext: "Weiter",
+        onbFinish: "Loslegen"
+      },
+      en: {
+        appTitle: "Carb Calculator",
+        appSub: "With Weekly Log & OFF Database",
+        tabDb: "Database",
+        tabPlate: "Plate",
+        tabPlan: "Weekly Log",
+        btnNew: "New",
+        searchPlaceholder: "Search food...",
+        myPlate: "My Plate",
+        toPlan: "Add to Log",
+        clear: "Clear",
+        emptyPlate: "Your plate is empty.",
+        tapHint: "Tap a food item in the database to add it here.",
+        lblAmount: "Amount",
+        lblKh: "Carbs",
+        lblKe: "CU (10g)",
+        lblBe: "BU (12g)",
+        lblKhG: "Carbs (g)",
+        weekPlan: "Weekly Log",
+        btnPrint: "Print",
+        btnCurrentWeek: "Current Week",
+        weekFrom: "Week from:",
+        weekTo: "to:",
+        today: "Today",
+        workday: "Workday",
+        vacation: "Day Off",
+        notePlaceholder: "Notes (e.g. exercise, sickness...)",
+        mealHeader: "Meal",
+        rowTime: "Time",
+        rowBz: "BG",
+        rowKh: "Carbs (g)",
+        rowBe: "CU/BU",
+        rowBolus: "Bolus-U",
+        rowBasal: "Basal-U",
+        modalEditTitle: "Edit Food",
+        modalNewTitle: "New Food",
+        lblFoodName: "Name",
+        lblCategory: "Category",
+        lblUnit: "Unit",
+        unitGramm: "Grams (g)",
+        unitMl: "Milliliters (ml)",
+        lblKh100: "Carbs / 100g/ml",
+        lblStandardPortion: "Standard Portion",
+        btnDelete: "Delete",
+        btnCancel: "Cancel",
+        btnSave: "Save",
+        transferModalTitle: "Add to Weekly Log",
+        transferPlatePreview: "Current Plate:",
+        selectDay: "Select Day",
+        selectMeal: "Select Meal",
+        btnApply: "Apply",
+        confirmResetWeek: "Do you really want to clear the entire weekly log?",
+        confirmDeleteFood: "Do you really want to delete this food item?",
+        validationAlert: "Please provide at least a name and carb content.",
+        noFoodsFound: "No food items found.",
+        themeTitle: "Display",
+        themeLight: "Light",
+        themeDark: "Dark",
+        menuTutorial: "Guide & Help",
+        menuAbout: "About this app / Impressum",
+        retentionTitle: "Log Retention",
+        ret1y: "1 Year",
+        ret6m: "6 Months",
+        ret1m: "1 Month",
+        ret1w: "1 Week",
+        retCurr: "Current week only",
+        scanBtn: "Scan Barcode",
+        scanError: "Could not start camera",
+        offNotFound: "Product with this barcode was not found on Open Food Facts.",
+        netError: "Network error or connection failed.",
+        camError: "Could not start camera",
+        savedPlatesTitle: "Meal Favorites (Saved Plates)",
+        saveFavBtn: "Save",
+        savePlateModalTitle: "Save Plate Favorite",
+        savePlateLbl: "Name for this plate:",
+        emptySavedPlates: "No saved plate favorites yet.",
+        loadPlate: "Load",
+        confirmDeletePlateFav: "Do you really want to delete this plate favorite?",
+        plateSavedMsg: "Plate favorite successfully saved!",
+        aboutTitle: "About this app & Impressum",
+        aboutAppName: "Carb Calculator & Weekly Log",
+        aboutDesc: "The Carb Calculator & Weekly Log helps people with diabetes with daily carbohydrate counting and blood glucose documentation.",
+        aboutFeaturesLbl: "Key Features:",
+        aboutFeatures: "Expanded OFF database with clean brand items, barcode scanner, fast food, favorites quick access, saved plate favorites, weekly log.",
+        aboutSourcesLbl: "Data Sources & Licenses:",
+        aboutSources: "Product data & barcodes: Provided by Open Food Facts (community database). Licensed under the Open Database License (ODbL).",
+        aboutPrivacyLbl: "Privacy:",
+        aboutPrivacy: "All data is stored exclusively locally on your device in the browser (localStorage).",
+        aboutDisclaimerTitle: "Medical Disclaimer",
+        aboutDisclaimer: "This app is for informational and documentation purposes only and does not replace professional medical advice, diagnosis, or treatment by a physician or diabetes counselor. Calculations for insulin and carbohydrates must always be checked independently. The developer assumes no liability for therapy decisions or health damages.",
+        aboutClose: "Close",
+        delTutTitle: "Deletion Gesture Found!",
+        delTutDesc: "You held a food item for 1 second. This is how you can delete custom or scanned food items from your list anytime.",
+        delTutBtn: "Got it",
+        onbSteps: [
+          {
+            icon: "book-open",
+            title: "1. Database & Favorites",
+            desc: "Browse hundreds of items. Star favorites to find them instantly in the 2nd category."
+          },
+          {
+            icon: "utensils",
+            title: "2. Plate & Saved Favorites",
+            desc: "Manage your plate, save frequent meal combinations as 'Saved Plates', and load them with one click."
+          },
+          {
+            icon: "trash-2",
+            title: "3. Delete Foods",
+            desc: "Hold any custom or scanned food item for 1 second to delete it from the database."
+          },
+          {
+            icon: "calendar",
+            title: "4. Weekly Log",
+            desc: "Document blood glucose, carbs, and insulin doses in your ongoing weekly log."
+          }
+        ],
+        onbPrev: "Back",
+        onbNext: "Next",
+        onbFinish: "Get Started"
+      },
+      zh: {
+        appTitle: "碳水计算器",
+        appSub: "带周日志与OFF数据库",
+        tabDb: "数据库",
+        tabPlate: "餐盘",
+        tabPlan: "周日志",
+        btnNew: "新增",
+        searchPlaceholder: "搜索食物...",
+        myPlate: "我的餐盘",
+        toPlan: "记入周志",
+        clear: "清空",
+        emptyPlate: "餐盘目前是空的。",
+        tapHint: "在数据库中点击食物即可添加至此处。",
+        lblAmount: "分量",
+        lblKh: "碳水",
+        lblKe: "碳水单位(10g)",
+        lblBe: "面包单位(12g)",
+        lblKhG: "碳水 (克)",
+        weekPlan: "周记录表",
+        btnPrint: "打印",
+        btnCurrentWeek: "本周",
+        weekFrom: "起始周:",
+        weekTo: "至:",
+        today: "今天",
+        workday: "工作日",
+        vacation: "休息日",
+        notePlaceholder: "备注（如运动、生病等...）",
+        mealHeader: "餐次",
+        rowTime: "时间",
+        rowBz: "血糖",
+        rowKh: "碳水 (克)",
+        rowBe: "碳水单位",
+        rowBolus: "大剂量",
+        rowBasal: "基础量",
+        modalEditTitle: "修改食物",
+        modalNewTitle: "新增食物",
+        lblFoodName: "名称",
+        lblCategory: "分类",
+        lblUnit: "单位",
+        unitGramm: "克 (g)",
+        unitMl: "毫升 (ml)",
+        lblKh100: "碳水 / 100g/ml",
+        lblStandardPortion: "标准份量",
+        btnDelete: "删除",
+        btnCancel: "取消",
+        btnSave: "保存",
+        transferModalTitle: "记录至周表",
+        transferPlatePreview: "当前餐盘:",
+        selectDay: "选择日期",
+        selectMeal: "选择餐次",
+        btnApply: "确认记录",
+        confirmResetWeek: "确定要清空整周的记录吗？",
+        confirmDeleteFood: "确定要删除该食物吗？",
+        validationAlert: "请至少输入食物名称与碳水含量。",
+        noFoodsFound: "未找到食物。",
+        themeTitle: "显示模式",
+        themeLight: "明亮",
+        themeDark: "深色",
+        menuTutorial: "使用指南与帮助",
+        menuAbout: "关于此应用 / 版权声明",
+        retentionTitle: "日志保留期限",
+        ret1y: "1年",
+        ret6m: "6个月",
+        ret1m: "1个月",
+        ret1w: "1周",
+        retCurr: "仅当前周",
+        scanBtn: "扫描条形码",
+        scanError: "无法启动摄像头",
+        offNotFound: "在 Open Food Facts 中未找到该条形码的产品。",
+        netError: "网络错误或连接失败。",
+        camError: "无法启动摄像头",
+        savedPlatesTitle: "常用餐盘 (保存的餐盘)",
+        saveFavBtn: "保存",
+        savePlateModalTitle: "保存餐盘收藏",
+        savePlateLbl: "为此餐盘命名:",
+        emptySavedPlates: "暂无保存的餐盘收藏。",
+        loadPlate: "加载",
+        confirmDeletePlateFav: "确定要删除此餐盘收藏吗？",
+        plateSavedMsg: "餐盘收藏保存成功！",
+        aboutTitle: "关于此应用与版权声明",
+        aboutAppName: "碳水计算器与周日志",
+        aboutDesc: "碳水计算器与周日志旨在帮助糖尿病患者进行日常碳水化合物计算和血糖记录。",
+        aboutFeaturesLbl: "主要功能：",
+        aboutFeatures: "包含精选知名品牌与产品的OFF数据库、条码扫描、快餐、收藏夹、餐盘收藏、周日志。",
+        aboutSourcesLbl: "数据来源与许可：",
+        aboutSources: "产品数据与条形码：由 Open Food Facts（社区数据库）提供。依据 Open Database License (ODbL) 授权许可。",
+        aboutPrivacyLbl: "隐私政策：",
+        aboutPrivacy: "所有数据均仅保存在您设备浏览器的本地存储（localStorage）中。",
+        aboutDisclaimerTitle: "医疗免责声明",
+        aboutDisclaimer: "本应用仅供信息和记录参考，不能替代医生或糖尿病专家的专业医疗诊断或治疗。胰岛素和碳水化合物的计算必须始终由用户自行负责检查。开发者对治疗决策或健康损害不承担任何责任。",
+        aboutClose: "关闭",
+        delTutTitle: "发现删除手势！",
+        delTutDesc: "您长按了食物1秒钟。通过此长按手势可以随时从列表中删除自定义或扫描添加的食物。",
+        delTutBtn: "知道了",
+        onbSteps: [
+          {
+            icon: "book-open",
+            title: "1. 数据库与收藏夹",
+            desc: "浏览上百种食物。点击星标收藏喜欢的食物，即可在第2个分类快速找到。"
+          },
+          {
+            icon: "utensils",
+            title: "2. 餐盘与常用餐盘",
+            desc: "管理您的餐盘，将常吃搭配保存为“常用餐盘”，一键即可重新加载。"
+          },
+          {
+            icon: "trash-2",
+            title: "3. 删除食物",
+            desc: "长按任意自创或扫描的食物1秒钟即可将其从数据库中删除。"
+          },
+          {
+            icon: "calendar",
+            title: "4. 周日志",
+            desc: "在持续的周日志中记录血糖、碳水和胰岛素剂量。"
+          }
+        ],
+        onbPrev: "上一步",
+        onbNext: "下一步",
+        onbFinish: "开始使用"
+      },
+      es: {
+        appTitle: "Calculadora de Raciones",
+        appSub: "Con registro semanal y base OFF",
+        tabDb: "Base de datos",
+        tabPlate: "Plato",
+        tabPlan: "Plan semanal",
+        btnNew: "Nuevo",
+        searchPlaceholder: "Buscar alimentos...",
+        myPlate: "Mi plato",
+        toPlan: "Añadir al plan",
+        clear: "Vaciar",
+        emptyPlate: "Tu plato aún está vacío.",
+        tapHint: "Toca un alimento en la base de datos para añadirlo aquí.",
+        lblAmount: "Cantidad",
+        lblKh: "HC",
+        lblKe: "Ración (10g)",
+        lblBe: "BE (12g)",
+        lblKhG: "HC (g)",
+        weekPlan: "Protocolo semanal",
+        btnPrint: "Imprimir",
+        btnCurrentWeek: "Semana actual",
+        weekFrom: "Semana del:",
+        weekTo: "al:",
+        today: "Hoy",
+        workday: "Laborable",
+        vacation: "Vacaciones / Libre",
+        notePlaceholder: "Notas (ej. deporte, enfermedad...)",
+        mealHeader: "Comida",
+        rowTime: "Hora",
+        rowBz: "Glucemia",
+        rowKh: "HC (g)",
+        rowBe: "Raciones / BE",
+        rowBolus: "Bolus-U",
+        rowBasal: "Basal-U",
+        modalEditTitle: "Editar alimento",
+        modalNewTitle: "Nuevo alimento",
+        lblFoodName: "Nombre",
+        lblCategory: "Categoría",
+        lblUnit: "Unidad",
+        unitGramm: "Gramos (g)",
+        unitMl: "Mililitros (ml)",
+        lblKh100: "HC / 100g/ml",
+        lblStandardPortion: "Porción estándar",
+        btnDelete: "Eliminar",
+        btnCancel: "Cancelar",
+        btnSave: "Guardar",
+        transferModalTitle: "Añadir al plan",
+        transferPlatePreview: "Plato actual:",
+        selectDay: "Seleccionar día",
+        selectMeal: "Seleccionar comida",
+        btnApply: "Aplicar",
+        confirmResetWeek: "¿Seguro que deseas vaciar todo el registro semanal?",
+        confirmDeleteFood: "¿Deseas eliminar este alimento?",
+        validationAlert: "Por favor, indica al menos un nombre y los carbohidratos.",
+        noFoodsFound: "No se encontraron alimentos.",
+        themeTitle: "Pantalla",
+        themeLight: "Claro",
+        themeDark: "Oscuro",
+        menuTutorial: "Guía y Ayuda",
+        menuAbout: "Acerca de esta app / Impressum",
+        retentionTitle: "Retención del registro",
+        ret1y: "1 año",
+        ret6m: "6 meses",
+        ret1m: "1 mes",
+        ret1w: "1 semana",
+        retCurr: "Solo semana actual",
+        scanBtn: "Escanear código de barras",
+        scanError: "No se pudo iniciar la cámara",
+        offNotFound: "Producto no encontrado en Open Food Facts.",
+        netError: "Error de red o conexión fallida.",
+        camError: "No se pudo iniciar la cámara",
+        savedPlatesTitle: "Platos Favoritos (Comidas guardadas)",
+        saveFavBtn: "Guardar",
+        savePlateModalTitle: "Guardar plato favorito",
+        savePlateLbl: "Nombre para este plato:",
+        emptySavedPlates: "No hay platos favoritos guardados.",
+        loadPlate: "Cargar",
+        confirmDeletePlateFav: "¿Deseas eliminar este plato favorito?",
+        plateSavedMsg: "¡Plato favorito guardado con éxito!",
+        aboutTitle: "Acerca de esta app e Impressum",
+        aboutAppName: "Calculadora de Raciones y Registro Semanal",
+        aboutDesc: "La Calculadora de Raciones y Registro Semanal ayuda a las personas con diabetes en el cálculo diario de carbohidratos y el registro de glucemia.",
+        aboutFeaturesLbl: "Características principales:",
+        aboutFeatures: "Base de datos OFF con productos de marca limpios, escáner, fast food, favoritos, platos favoritos guardados, registro semanal.",
+        aboutSourcesLbl: "Fuentes de datos y licencias:",
+        aboutSources: "Datos y códigos de barras: Proporcionados por Open Food Facts (comunidad). Licenciados bajo ODbL.",
+        aboutPrivacyLbl: "Privacidad:",
+        aboutPrivacy: "Todos los datos se almacenan exclusivamente de forma local en su dispositivo (localStorage).",
+        aboutDisclaimerTitle: "Aviso médico importante",
+        aboutDisclaimer: "Esta aplicación es exclusivamente para fines informativos y de documentación y no sustituye el asesoramiento, diagnóstico o tratamiento médico profesional por parte de un médico o educador en diabetes. Los cálculos de insulina y carbohidratos deben ser verificados siempre bajo su propia responsabilidad. El desarrollador no asume ninguna responsabilidad por decisiones terapéuticas o daños a la salud.",
+        aboutClose: "Cerrar",
+        delTutTitle: "¡Gesto de borrado encontrado!",
+        delTutDesc: "Mantuviste presionado un alimento durante 1 segundo. Así puedes eliminar fácilmente alimentos personalizados o escaneados de tu lista.",
+        delTutBtn: "Entendido",
+        onbSteps: [
+          {
+            icon: "book-open",
+            title: "1. Base de datos y Favoritos",
+            desc: "Explora cientos de alimentos. Marca favoritos para encontrarlos al instante en la 2ª categoría."
+          },
+          {
+            icon: "utensils",
+            title: "2. Plato y Platos Favoritos",
+            desc: "Gestiona tu plato, guarda tus combinaciones frecuentes como 'Platos Favoritos' y cárgalas con un clic."
+          },
+          {
+            icon: "trash-2",
+            title: "3. Borrar alimentos",
+            desc: "Mantén presionado cualquier alimento personalizado o escaneado durante 1 segundo para borrarlo."
+          },
+          {
+            icon: "calendar",
+            title: "4. Plan semanal",
+            desc: "Documenta la glucemia, carbohidratos y dosis de insulina en tu registro semanal continuo."
+          }
+        ],
+        onbPrev: "Anterior",
+        onbNext: "Siguiente",
+        onbFinish: "Comenzar"
+      }
+    };
+
+    const DAYS_DATA_MAP = {
+      de: ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'],
+      en: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      zh: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+      es: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+    };
+
+    const CATEGORIES_MAP = {
+      de: [
+        { id: 'all', name: 'Alle' },
+        { id: 'favoriten', name: '⭐ Favoriten' },
+        { id: 'milch', name: '🥛 Milch & Käse' },
+        { id: 'fastfood', name: '🍔 Fastfood' },
+        { id: 'wurst', name: '🥓 Wurst & Fleisch' },
+        { id: 'aufstriche', name: '🍫 Süßes & Aufstriche' },
+        { id: 'brot', name: '🍞 Brot & Getreide' },
+        { id: 'cerealien', name: '🥣 Cerealien' },
+        { id: 'obst', name: '🍎 Obst' },
+        { id: 'gemuese', name: '🥦 Gemüse' },
+        { id: 'getraenke', name: '🥤 Getränke' },
+        { id: 'gerichte', name: '🍕 Fertiggerichte' },
+        { id: 'eis', name: '🍦 Eis' }
+      ],
+      en: [
+        { id: 'all', name: 'All' },
+        { id: 'favoriten', name: '⭐ Favorites' },
+        { id: 'milch', name: '🥛 Dairy & Cheese' },
+        { id: 'fastfood', name: '🍔 Fastfood' },
+        { id: 'wurst', name: '🥓 Cold Cuts & Meat' },
+        { id: 'aufstriche', name: '🍫 Sweets & Spreads' },
+        { id: 'brot', name: '🍞 Bread & Grains' },
+        { id: 'cerealien', name: '🥣 Cereals' },
+        { id: 'obst', name: '🍎 Fruit' },
+        { id: 'gemuese', name: '🥦 Vegetables' },
+        { id: 'getraenke', name: '🥤 Drinks' },
+        { id: 'gerichte', name: '🍕 Ready Meals' },
+        { id: 'eis', name: '🍦 Ice Cream' }
+      ],
+      zh: [
+        { id: 'all', name: '全部' },
+        { id: 'favoriten', name: '⭐ 收藏夹' },
+        { id: 'milch', name: '🥛 奶制品乳酪' },
+        { id: 'fastfood', name: '🍔 快餐' },
+        { id: 'wurst', name: '🥓 肉制品与肉类' },
+        { id: 'aufstriche', name: '🍫 甜品与酱料' },
+        { id: 'brot', name: '🍞 面包烘焙' },
+        { id: 'cerealien', name: '🥣 谷物麦片' },
+        { id: 'obst', name: '🍎 水果' },
+        { id: 'gemuese', name: '🥦 蔬菜豆类' },
+        { id: 'getraenke', name: '🥤 饮品' },
+        { id: 'gerichte', name: '🍕 预制正餐' },
+        { id: 'eis', name: '🍦 冰淇淋' }
+      ],
+      es: [
+        { id: 'all', name: 'Todos' },
+        { id: 'favoriten', name: '⭐ Favoritos' },
+        { id: 'milch', name: '🥛 Lácteos y Quesos' },
+        { id: 'fastfood', name: '🍔 Fastfood' },
+        { id: 'wurst', name: '🥓 Embutidos y Carne' },
+        { id: 'aufstriche', name: '🍫 Dulces y Untables' },
+        { id: 'brot', name: '🍞 Panadería' },
+        { id: 'cerealien', name: '🥣 Cereales' },
+        { id: 'obst', name: '🍎 Frutas' },
+        { id: 'gemuese', name: '🥦 Verduras' },
+        { id: 'getraenke', name: '🥤 Bebidas' },
+        { id: 'gerichte', name: '🍕 Platos Preparados' },
+        { id: 'eis', name: '🍦 Helados' }
+      ]
+    };
+
+    const SLOTS_DEF = ['1', '2', '3', '4', '5', '6', '7'];
+
+    const DEFAULT_FOODS = [
+      // --- MILCH & KÄSE ---
+      { id: 'm_1', name: "Vollmilch 3.5% Fett", name_en: "Whole Milk 3.5%", name_zh: "全脂牛奶 3.5%", name_es: "Leche Entera 3.5%", cat: 'milch', kh: 4.8, portion: 200, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'm_2', name: "Fettarme Milch 1.5%", name_en: "Low-fat Milk 1.5%", name_zh: "低脂牛奶 1.5%", name_es: "Leche Semidesnatada 1.5%", cat: 'milch', kh: 4.9, portion: 200, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'm_3', name: "Alpro Sojadrink Original", name_en: "Alpro Soy Drink Original", name_zh: "Alpro 原味豆奶", name_es: "Alpro Bebida de Soja Original", cat: 'milch', kh: 2.5, portion: 200, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'm_4', name: "Alpro Mandeldrink Ohne Zucker", name_en: "Alpro Almond Drink Unsweetened", name_zh: "Alpro 无糖杏仁奶", name_es: "Alpro Bebida de Almendras Sin Azúcar", cat: 'milch', kh: 0.1, portion: 200, unit: 'ml', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_5', name: "Philadelphia Frischkäse Classic", name_en: "Philadelphia Cream Cheese Original", name_zh: "费城原味奶油奶酪", name_es: "Queso Crema Philadelphia Original", cat: 'milch', kh: 4.0, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_6', name: "Naturjoghurt 3.5%", name_en: "Plain Natural Yogurt 3.5%", name_zh: "原味酸奶 3.5%", name_es: "Yogur Natural 3.5%", cat: 'milch', kh: 4.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'm_7', name: "Griechischer Joghurt 10%", name_en: "Greek Yogurt 10%", name_zh: "希腊酸奶 10%", name_es: "Yogur Griego 10%", cat: 'milch', kh: 4.2, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_8', name: "Magerquark", name_en: "Low-fat Quark / Curd", name_zh: "脱脂夸克奶酪", name_es: "Queso Quark Desnatado", cat: 'milch', kh: 4.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_9', name: "Gouda Schnittkäse 48%", name_en: "Gouda Cheese 48%", name_zh: "高达干酪 48%", name_es: "Queso Gouda 48%", cat: 'milch', kh: 0.1, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_10', name: "Mozzarella in Salzlake", name_en: "Fresh Mozzarella", name_zh: "新鲜莫苏里拉", name_es: "Queso Mozzarella", cat: 'milch', kh: 1.0, portion: 125, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'm_11', name: "Emmentaler Hartkäse", name_en: "Emmental Cheese", name_zh: "埃曼塔尔瑞士干酪", name_es: "Queso Emmental", cat: 'milch', kh: 0.1, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+
+      // --- FASTFOOD ---
+      { id: 'ff_1', name: "McDonald's Big Mac", name_en: "McDonald's Big Mac", name_zh: "麦当劳巨无霸", name_es: "McDonald's Big Mac", cat: 'fastfood', kh: 20.5, portion: 219, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
+      { id: 'ff_2', name: "McDonald's Pommes Frites (M)", name_en: "McDonald's French Fries (Medium)", name_zh: "麦当劳中薯条", name_es: "McDonald's Patatas Fritas (Med.)", cat: 'fastfood', kh: 35.0, portion: 117, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_3', name: "McDonald's Chicken McNuggets (6 Stk.)", name_en: "McDonald's Chicken McNuggets (6 pcs)", name_zh: "麦当劳麦乐鸡 (6块)", name_es: "McDonald's McNuggets (6 uds.)", cat: 'fastfood', kh: 11.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_4', name: "McDonald's Cheeseburger", name_en: "McDonald's Cheeseburger", name_zh: "麦当劳芝士汉堡", name_es: "McDonald's Cheeseburger", cat: 'fastfood', kh: 24.0, portion: 114, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_5', name: "McDonald's Hamburger", name_en: "McDonald's Hamburger", name_zh: "麦当劳普通汉堡", name_es: "McDonald's Hamburguesa", cat: 'fastfood', kh: 25.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_6', name: "McDonald's Filet-o-Fish", name_en: "McDonald's Filet-o-Fish", name_zh: "麦当劳菲力鱼堡", name_es: "McDonald's Filet-o-Fish", cat: 'fastfood', kh: 27.0, portion: 139, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_7', name: "McDonald's Royal TS", name_en: "McDonald's Quarter Pounder with Cheese", name_zh: "麦当劳至尊汉堡", name_es: "McDonald's Royal TS", cat: 'fastfood', kh: 18.0, portion: 210, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_8', name: "McDonald's McFlurry Oreo", name_en: "McDonald's McFlurry Oreo", name_zh: "麦当劳奥利奥麦旋风", name_es: "McDonald's McFlurry Oreo", cat: 'fastfood', kh: 29.0, portion: 175, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_9', name: "McDonald's Apfeltasche", name_en: "McDonald's Apple Pie", name_zh: "麦当劳香芋派/苹果派", name_es: "McDonald's Pastel de Manzana", cat: 'fastfood', kh: 42.0, portion: 80, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_10', name: "Burger King Whopper", name_en: "Burger King Whopper", name_zh: "汉堡王皇堡", name_es: "Burger King Whopper", cat: 'fastfood', kh: 18.1, portion: 270, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_11', name: "Burger King King Nuggets (6 Stk.)", name_en: "Burger King King Nuggets (6 pcs)", name_zh: "汉堡王鸡块 (6块)", name_es: "Burger King Nuggets (6 uds.)", cat: 'fastfood', kh: 13.3, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_12', name: "Burger King Big King", name_en: "Burger King Big King", name_zh: "汉堡王大王汉堡", name_es: "Burger King Big King", cat: 'fastfood', kh: 19.5, portion: 215, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_13', name: "Burger King Chili Cheese Nuggets", name_en: "Burger King Chili Cheese Nuggets", name_zh: "汉堡王芝士辣椒块", name_es: "Burger King Nuggets Chili Cheese", cat: 'fastfood', kh: 22.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_14', name: "Burger King Onion Rings", name_en: "Burger King Onion Rings", name_zh: "汉堡王洋葱圈", name_es: "Burger King Aros de Cebolla", cat: 'fastfood', kh: 31.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_15', name: "Subway Sub Putenbrust (15cm)", name_en: "Subway Turkey Sub (15cm)", name_zh: "赛百味火鸡胸肉 (15cm)", name_es: "Subway Sub de Pavo (15cm)", cat: 'fastfood', kh: 18.2, portion: 220, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_16', name: "Subway Sub Thunfisch (15cm)", name_en: "Subway Tuna Sub (15cm)", name_zh: "赛百味金枪鱼 (15cm)", name_es: "Subway Sub de Atún (15cm)", cat: 'fastfood', kh: 19.0, portion: 230, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_17', name: "Subway Cookie Chocolate Chip", name_en: "Subway Chocolate Chip Cookie", name_zh: "赛百味巧克力曲奇", name_es: "Subway Cookie de Chocolate", cat: 'fastfood', kh: 64.0, portion: 45, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_18', name: "Dunkin' Donuts Glazed Donut", name_en: "Dunkin' Donuts Glazed Donut", name_zh: "唐恩都乐糖霜甜甜圈", name_es: "Dunkin' Donuts Donut Glaseado", cat: 'fastfood', kh: 50.0, portion: 52, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_19', name: "Dunkin' Donuts Boston Kreme", name_en: "Dunkin' Donuts Boston Kreme Donut", name_zh: "唐恩都乐波士顿奶油", name_es: "Dunkin' Donuts Boston Kreme", cat: 'fastfood', kh: 37.6, portion: 85, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_20', name: "Dunkin' Donuts Strawberry Sprinkles", name_en: "Dunkin' Donuts Strawberry Sprinkles", name_zh: "唐恩都乐草莓彩针甜甜圈", name_es: "Dunkin' Donuts Fresa", cat: 'fastfood', kh: 54.0, portion: 65, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ff_21', name: "Pizza Hut Pizza Salami (1 Slice)", name_en: "Pizza Hut Pepperoni Pizza (1 Slice)", name_zh: "必胜客萨拉米披萨 (1块)", name_es: "Pizza Hut Pizza de Salami (1 porción)", cat: 'fastfood', kh: 28.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_22', name: "Domino's Pizza Margherita (1 Slice)", name_en: "Domino's Margherita Pizza (1 Slice)", name_zh: "达美乐玛格丽特披萨 (1块)", name_es: "Domino's Pizza Margarita (1 porción)", cat: 'fastfood', kh: 30.0, portion: 95, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_23', name: "KFC Hot Wings (3 Stk.)", name_en: "KFC Hot Wings (3 pcs)", name_zh: "肯德基辣翅 (3个)", name_es: "KFC Alitas Picantes (3 uds.)", cat: 'fastfood', kh: 8.5, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ff_24', name: "KFC Crispy Strips (3 Stk.)", name_en: "KFC Crispy Strips (3 pcs)", name_zh: "肯德基香辣鸡条 (3条)", name_es: "KFC Tiras Crujientes (3 uds.)", cat: 'fastfood', kh: 12.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- WURST & FLEISCH ---
+      { id: 'w_1', name: "Ungarische Salami", name_en: "Hungarian Salami", name_zh: "匈牙利萨拉米", name_es: "Salami Húngaro", cat: 'wurst', kh: 0.8, portion: 25, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
+      { id: 'w_2', name: "Bierschinken / Fleischwurst", name_en: "Bologna Sausage", name_zh: "德式肉肠", name_es: "Mortadela alemana", cat: 'wurst', kh: 1.2, portion: 40, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_3', name: "Kochschinken", name_en: "Boiled Ham", name_zh: "熟火腿", name_es: "Jamón cocido", cat: 'wurst', kh: 0.5, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_4', name: "Schwarzwälder Schinken", name_en: "Black Forest Ham", name_zh: "黑森林火腿", name_es: "Jamón de la Selva Negra", cat: 'wurst', kh: 0.2, portion: 25, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_5', name: "Mettwurst / Zwiebelmettwurst", name_en: "Mettwurst Spread", name_zh: "洋葱肉肠酱", name_es: "Mettwurst", cat: 'wurst', kh: 1.0, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_6', name: "Wiener Würstchen / Frankfurter", name_en: "Wiener / Frankfurter", name_zh: "维也纳小香肠", name_es: "Salchichas Vienesas", cat: 'wurst', kh: 0.8, portion: 60, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_7', name: "Bockwurst", name_en: "Bockwurst", name_zh: "博克香肠", name_es: "Salchicha Bockwurst", cat: 'wurst', kh: 1.0, portion: 80, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_8', name: "Rindersteak gebraten", name_en: "Fried Beef Steak", name_zh: "煎牛排", name_es: "Bistec de ternera", cat: 'wurst', kh: 0.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_9', name: "Hähnchenbrustfilet gegrillt", name_en: "Grilled Chicken Breast", name_zh: "烤鸡胸肉", name_es: "Pechuga de pollo a la plancha", cat: 'wurst', kh: 0.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_10', name: "Schweineschnitzel paniert", name_en: "Breaded Pork Schnitzel", name_zh: "炸猪排", name_es: "Escalope de cerdo empanado", cat: 'wurst', kh: 12.0, portion: 180, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- SÜSSES & AUFSTRICHE ---
+      { id: 's_1', name: "Nutella Nuss-Nougat-Creme", name_en: "Nutella Hazelnut Spread", name_zh: "能多益榛子酱", name_es: "Nutella Crema de Avellanas", cat: 'aufstriche', kh: 57.5, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_2', name: "Milka Alpenmilch Schokolade", name_en: "Milka Alpine Milk Chocolate", name_zh: "妙卡牛奶巧克力", name_es: "Milka Chocolate con Leche", cat: 'aufstriche', kh: 59.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_3', name: "Haribo Goldbären", name_en: "Haribo Goldbears Gummy Bears", name_zh: "哈瑞宝金熊小熊糖", name_es: "Haribo Ositos de Oro", cat: 'aufstriche', kh: 77.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_4', name: "Ritter Sport Edelnougat", name_en: "Ritter Sport Fine Nougat", name_zh: "瑞德斯堡榛果夹心", name_es: "Ritter Sport Nougat", cat: 'aufstriche', kh: 49.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_5', name: "Kinder Bueno Riegel", name_en: "Kinder Bueno Bar", name_zh: "健达缤纷乐", name_es: "Kinder Bueno", cat: 'aufstriche', kh: 49.5, portion: 43, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_6', name: "M&M's Choco Schokodragees", name_en: "M&M's Chocolate Candies", name_zh: "M&M's 巧克力豆", name_es: "M&M's Chocolate", cat: 'aufstriche', kh: 70.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_7', name: "Oreo Kakao-Doppelkeks", name_en: "Oreo Sandwich Cookies", name_zh: "奥利奥夹心饼干", name_es: "Galletas Oreo", cat: 'aufstriche', kh: 68.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_8', name: "Erdbeermarmelade / Konfitüre", name_en: "Strawberry Jam", name_zh: "草莓果酱", name_es: "Mermelada de Fresa", cat: 'aufstriche', kh: 60.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_9', name: "Blütenhonig / Bienenhonig", name_en: "Flower Honey", name_zh: "天然花蜜", name_es: "Miel de Flores", cat: 'aufstriche', kh: 82.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_10', name: "Kinderschokolade (Riegel)", name_en: "Kinder Chocolate Bar", name_zh: "健达巧克力条", name_es: "Barrita Kinder", cat: 'aufstriche', kh: 53.5, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_11', name: "Schokokuss / Schaumkuss", name_en: "Chocolate Marshmallow", name_zh: "巧克力棉花糖酥", name_es: "Besito de Chocolate", cat: 'aufstriche', kh: 62.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_12', name: "Ferrero Rocher Praline", name_en: "Ferrero Rocher", name_zh: "费列罗榛果威化", name_es: "Ferrero Rocher", cat: 'aufstriche', kh: 44.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 's_13', name: "Erdnussbutter (Peanut Butter)", name_en: "Peanut Butter", name_zh: "花生酱", name_es: "Mantequilla de Cacahuete", cat: 'aufstriche', kh: 16.0, portion: 20, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+
+      // --- BROT & GETREIDE ---
+      { id: 'b_1', name: "Weizenbrot / Weißbrot", name_en: "White Wheat Bread", name_zh: "白小麦面包", name_es: "Pan Blanco de Trigo", cat: 'brot', kh: 48.0, portion: 50, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'b_2', name: "Graubrot / Mischbrot", name_en: "Mixed Rye & Wheat Bread", name_zh: "混合黑麦小麦面包", name_es: "Pan Mezcla de Centeno y Trigo", cat: 'brot', kh: 45.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'b_3', name: "Vollkornbrot 100% Rye", name_en: "Whole Grain Bread", name_zh: "全麦黑麦面包", name_es: "Pan Integral de Centeno", cat: 'brot', kh: 39.0, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
+      { id: 'b_4', name: "Weizenbrötchen / Schrippe", name_en: "Wheat Roll / Bun", name_zh: "小麦小面包", name_es: "Panecillo Blanco", cat: 'brot', kh: 52.0, portion: 50, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 'b_5', name: "Laugenbrezel frisch", name_en: "German Pretzel", name_zh: "德国碱水结面包", name_es: "Pretzel Alemán", cat: 'brot', kh: 54.0, portion: 85, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'b_6', name: "Vollkorntoast", name_en: "Whole Wheat Toast Bread", name_zh: "全麦吐司", name_es: "Pan de Molde Integral", cat: 'brot', kh: 42.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- CEREALIEN ---
+      { id: 'c_1', name: "Kölln Blütenzarte Haferflocken", name_en: "Kölln Rolled Oats", name_zh: "克林燕麦片", name_es: "Copos de Avena Kölln", cat: 'cerealien', kh: 58.7, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
+      { id: 'c_2', name: "Klassische Cornflakes", name_en: "Classic Cornflakes", name_zh: "经典原味玉米片", name_es: "Copos de Maíz Clásicos", cat: 'cerealien', kh: 80.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'c_3', name: "Honig-Cornflakes", name_en: "Honey Cornflakes", name_zh: "蜂蜜玉米片", name_es: "Cornflakes con Miel", cat: 'cerealien', kh: 84.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'c_4', name: "Knusper-Schokomüsli", name_en: "Crunchy Chocolate Granola", name_zh: "脆巧克力麦片", name_es: "Muesli Crujiente de Chocolate", cat: 'cerealien', kh: 64.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- OBST ---
+      { id: 'o_1', name: "Apfel frisch (mit Schale)", name_en: "Fresh Apple (with skin)", name_zh: "鲜苹果 (带皮)", name_es: "Manzana Fresca", cat: 'obst', kh: 11.0, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
+      { id: 'o_2', name: "Banane frisch (ohne Schale)", name_en: "Fresh Banana (peeled)", name_zh: "鲜香蕉 (去皮)", name_es: "Plátano Fresco", cat: 'obst', kh: 20.0, portion: 110, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_3', name: "Erdbeeren frisch", name_en: "Fresh Strawberries", name_zh: "鲜草莓", name_es: "Fresas Frescas", cat: 'obst', kh: 5.5, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_4', name: "Kiwi grün frisch", name_en: "Green Kiwi", name_zh: "绿奇异果", name_es: "Kiwi Verde", cat: 'obst', kh: 9.1, portion: 80, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- GEMÜSE ---
+      { id: 'g_1', name: "Karotten / Möhren frisch", name_en: "Fresh Carrots", name_zh: "新鲜胡萝卜", name_es: "Zanahorias Frescas", cat: 'gemuese', kh: 5.0, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'g_2', name: "Tomaten frisch", name_en: "Fresh Tomatoes", name_zh: "鲜西红柿", name_es: "Tomates Frescos", cat: 'gemuese', kh: 2.6, portion: 120, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'g_3', name: "Salatgurke frisch", name_en: "Fresh Cucumber", name_zh: "新鲜黄瓜", name_es: "Pepino Fresco", cat: 'gemuese', kh: 1.8, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'g_4', name: "Brokkoli frisch gekocht", name_en: "Cooked Broccoli", name_zh: "煮熟西兰花", name_es: "Brócoli Cocido", cat: 'gemuese', kh: 2.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+
+      // --- GETRÄNKE ---
+      { id: 'd_1', name: "Mineralwasser still / spritzig", name_en: "Mineral Water", name_zh: "矿泉水", name_es: "Agua Mineral", cat: 'getraenke', kh: 0.0, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'd_2', name: "Coca-Cola klassisch zuckergesüßt", name_en: "Classic Cola", name_zh: "经典可口可乐", name_es: "Coca-Cola Clásica", cat: 'getraenke', kh: 10.6, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 'd_3', name: "Coca-Cola Zero / Light", name_en: "Coca-Cola Zero", name_zh: "零度无糖可乐", name_es: "Coca-Cola Zero", cat: 'getraenke', kh: 0.0, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'd_4', name: "Spezi / Cola-Mix gesüßt", name_en: "Cola & Orange Soda Mix", name_zh: "可乐橙汁混合饮料", name_es: "Mezcla Cola y Naranja (Spezi)", cat: 'getraenke', kh: 10.2, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 'd_5', name: "Orangensaft 100% Direktsaft", name_en: "100% Orange Juice", name_zh: "100%纯橙汁", name_es: "Zumo de Naranja 100%", cat: 'getraenke', kh: 9.1, portion: 200, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'd_6', name: "Red Bull Energy Drink", name_en: "Red Bull Energy Drink", name_zh: "红牛能量饮料", name_es: "Red Bull Energy Drink", cat: 'getraenke', kh: 11.0, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'd_7', name: "Pilsener / Helles Bier", name_en: "Lager / Pilsner Beer", name_zh: "皮尔森啤酒", name_es: "Cerveza Rubia / Pilsen", cat: 'getraenke', kh: 3.1, portion: 330, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
+
+      // --- FERTIGGERICHTE & MAHLZEITEN ---
+      { id: 'ma_1', name: "Dr. Oetker Pizza Ristorante Salami", name_en: "Dr. Oetker Pizza Ristorante Salami", name_zh: "欧特家萨拉米披萨", name_es: "Pizza Ristorante Salami Dr. Oetker", cat: 'gerichte', kh: 28.0, portion: 320, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_2', name: "Pasta / Nudeln gekocht", name_en: "Cooked Pasta", name_zh: "煮熟意面", name_es: "Pasta Cocida", cat: 'gerichte', kh: 28.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_3', name: "Basmatireis gekocht", name_en: "Cooked Basmati Rice", name_zh: "熟香米饭", name_es: "Arroz Basmati Cocido", cat: 'gerichte', kh: 27.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_4', name: "Salzkartoffeln gekocht", name_en: "Boiled Potatoes", name_zh: "水煮土豆", name_es: "Patatas Cocidas", cat: 'gerichte', kh: 15.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_5', name: "Döner Kebab (Fladenbrot komplett)", name_en: "Doner Kebab in pita", name_zh: "土耳其烤肉夹馍", name_es: "Döner Kebab Completo", cat: 'gerichte', kh: 18.0, portion: 350, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_6', name: "Lasagne Bolognese (Tiefkühl / Fertiggericht)", name_en: "Lasagne Bolognese", name_zh: "意式肉酱千层面", name_es: "Lasaña Boloñesa", cat: 'gerichte', kh: 16.5, portion: 400, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'ma_7', name: "Gemüseeintopf mit Kartoffeln", name_en: "Vegetable Stew with Potatoes", name_zh: "土耳其/德式蔬菜土豆浓汤", name_es: "Estofado de verduras con patatas", cat: 'gerichte', kh: 9.5, portion: 350, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+
+      // --- EIS ---
+      { id: 'ei_1', name: "Vanille-Milcheis", name_en: "Vanilla Milk Ice Cream", name_zh: "香草牛奶冰淇淋", name_es: "Helado de Vainilla", cat: 'eis', kh: 24.0, portion: 75, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ei_2', name: "Schokoladeneis", name_en: "Chocolate Ice Cream", name_zh: "巧克力冰淇淋", name_es: "Helado de Chocolate", cat: 'eis', kh: 26.0, portion: 75, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'ei_3', name: "Spaghetti-Eis Portion", name_en: "Spaghetti Ice Cream Portion", name_zh: "意面冰淇淋", name_es: "Spaghetti Eis", cat: 'eis', kh: 35.0, portion: 200, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false }
+    ];
+
+    let foods = [];
+    let currentCategory = 'all';
+    let searchQuery = '';
+    let currentEditingId = null;
+    let plate = [];
+
+    let weekHistory = {};
+    let currentWeekKey = '';
+    let planData = {
+      startDate: '',
+      endDate: '',
+      days: []
+    };
+
+    function t(key) {
+      try {
+        return (I18N[currentLang] && I18N[currentLang][key]) || (I18N.de[key]) || key;
+      } catch(e) {
+        return key;
+      }
+    }
+
+    function showCustomAlert(msg) {
+      const modal = document.getElementById('custom-dialog');
+      document.getElementById('dialog-title-text').textContent = currentLang === 'de' ? 'Hinweis' : currentLang === 'en' ? 'Notice' : currentLang === 'zh' ? '提示' : 'Aviso';
+      document.getElementById('dialog-message-text').textContent = msg;
+      document.getElementById('dialog-buttons').innerHTML = `
+        <button onclick="closeCustomDialog()" class="px-4 h-8 rounded-xl bg-indigo-600 text-white font-bold text-xs hover:bg-indigo-700">OK</button>
+      `;
+      modal.classList.remove('hidden');
+    }
+
+    function showCustomConfirm(msg, onYes) {
+      const modal = document.getElementById('custom-dialog');
+      document.getElementById('dialog-title-text').textContent = currentLang === 'de' ? 'Bestätigung' : currentLang === 'en' ? 'Confirmation' : currentLang === 'zh' ? '确认' : 'Confirmación';
+      document.getElementById('dialog-message-text').textContent = msg;
+      const yesText = currentLang === 'de' ? 'Ja' : currentLang === 'en' ? 'Yes' : currentLang === 'zh' ? '确定' : 'Sí';
+      const noText = currentLang === 'de' ? 'Abbrechen' : currentLang === 'en' ? 'Cancel' : currentLang === 'zh' ? '取消' : 'Cancelar';
+      
+      document.getElementById('dialog-buttons').innerHTML = `
+        <button onclick="closeCustomDialog()" class="px-3 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-semibold">${noText}</button>
+        <button onclick="window._dialogConfirmCallback(); closeCustomDialog();" class="px-4 h-8 rounded-xl bg-rose-600 text-white font-bold text-xs hover:bg-rose-700">${yesText}</button>
+      `;
+      window._dialogConfirmCallback = onYes;
+      modal.classList.remove('hidden');
+    }
+
+    function closeCustomDialog() {
+      document.getElementById('custom-dialog').classList.add('hidden');
+    }
+
+    async function ladeProduktVonOpenFoodFacts(barcode) {
+      let lokalerCache = {};
+      try {
+        lokalerCache = JSON.parse(localStorage.getItem('meine_lebensmittel') || '{}');
+      } catch(e) {}
+
+      if (lokalerCache[barcode]) {
+        return lokalerCache[barcode];
+      }
+
+      const url = `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,product_name_de,nutriments`;
+      
+      try {
+        const response = await fetch(url, {
+          headers: { 'User-Agent': 'KeBeRechnerTestApp/1.0' }
+        });
+        const data = await response.json();
+
+        if (data.status === 1) {
+          const prod = data.product;
+          const name = prod.product_name_de || prod.product_name || "Unbekanntes Produkt";
+          const carbs = prod.nutriments?.carbohydrates_100g || 0;
+
+          const neuesProdukt = {
+            id: 'off_' + barcode,
+            barcode: barcode,
+            name: name,
+            cat: 'fastfood',
+            unit: 'g',
+            kh: carbs,
+            portion: 100,
+            geschwindigkeit: 'mittel',
+            isFavorite: false
+          };
+
+          lokalerCache[barcode] = neuesProdukt;
+          try {
+            localStorage.setItem('meine_lebensmittel', JSON.stringify(lokalerCache));
+          } catch(e) {}
+
+          return neuesProdukt;
+        } else {
+          showCustomAlert(t('offNotFound'));
+          return null;
+        }
+      } catch (error) {
+        console.error("Netzwerkfehler:", error);
+        showCustomAlert(t('netError'));
+        return null;
+      }
+    }
+
+    async function starteKameraScanner() {
+      const readerDiv = document.getElementById('reader');
+      const isVisible = readerDiv.style.display === 'block';
+
+      if (isVisible) {
+        if (html5QrCode && html5QrCode.isScanning) {
+          await html5QrCode.stop().catch(e => {});
+        }
+        readerDiv.style.display = 'none';
+        return;
+      }
+
+      readerDiv.style.display = 'block';
+
+      if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("reader");
+      }
+      
+      html5QrCode.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: { width: 250, height: 150 } },
+        async (decodedText, decodedResult) => {
+          try {
+            if (html5QrCode && html5QrCode.isScanning) {
+              await html5QrCode.stop();
+            }
+          } catch(e) {}
+          readerDiv.style.display = 'none';
+
+          const produkt = await ladeProduktVonOpenFoodFacts(decodedText);
+          
+          if (produkt) {
+            if (!foods.some(f => f.id === produkt.id || f.barcode === decodedText)) {
+              foods.unshift(produkt);
+              saveFoods();
+              renderFoodGrid();
+              renderCategoryBar();
+            }
+            addFoodToPlate(produkt.id);
+            showCustomAlert(`Gefunden & auf Teller gelegt: ${produkt.name} (${produkt.kh}g KH / 100g)`);
+          }
+        },
+        (errorMessage) => {}
+      ).catch(err => {
+        showCustomAlert(t('camError') + ": " + (err.message || err));
+        readerDiv.style.display = 'none';
+      });
+    }
+
+    function checkOnboarding() {
+      try {
+        const shown = localStorage.getItem('ke_onboarding_shown');
+        if (!shown) {
+          openOnboarding();
+        }
+      } catch(e) {}
+    }
+
+    function openOnboarding() {
+      currentOnbStep = 0;
+      renderOnboardingStep();
+      document.getElementById('onboarding-modal').classList.remove('hidden');
+    }
+
+    function openOnboardingManual() {
+      document.getElementById('settings-dropdown').classList.add('hidden');
+      openOnboarding();
+    }
+
+    function closeOnboarding() {
+      try {
+        localStorage.setItem('ke_onboarding_shown', 'true');
+      } catch(e) {}
+      document.getElementById('onboarding-modal').classList.add('hidden');
+    }
+
+    function openAboutModal() {
+      document.getElementById('settings-dropdown').classList.add('hidden');
+      document.getElementById('about-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeAboutModal() {
+      document.getElementById('about-modal').classList.add('hidden');
+    }
+
+    function renderOnboardingStep() {
+      const steps = t('onbSteps');
+      const step = steps[currentOnbStep];
+      const content = document.getElementById('onboarding-content');
+      const dots = document.getElementById('onboarding-dots');
+      const prevBtn = document.getElementById('btn-onb-prev');
+      const nextBtn = document.getElementById('btn-onb-next');
+
+      dots.innerHTML = steps.map((_, i) => `
+        <span class="h-1.5 rounded-full transition-all ${i === currentOnbStep ? 'w-6 bg-indigo-600' : 'w-1.5 bg-slate-200 dark:bg-slate-700'}"></span>
+      `).join('');
+
+      content.innerHTML = `
+        <div class="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm mb-1">
+          <i data-lucide="${step.icon}" class="w-7 h-7"></i>
+        </div>
+        <h4 class="text-sm font-bold text-slate-900 dark:text-white">${step.title}</h4>
+        <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed px-1">${step.desc}</p>
+      `;
+      lucide.createIcons();
+
+      prevBtn.classList.toggle('invisible', currentOnbStep === 0);
+      nextBtn.textContent = currentOnbStep === steps.length - 1 ? t('onbFinish') : t('onbNext');
+    }
+
+    function nextOnboardingStep() {
+      const steps = t('onbSteps');
+      if (currentOnbStep < steps.length - 1) {
+        currentOnbStep++;
+        renderOnboardingStep();
+      } else {
+        closeOnboarding();
+      }
+    }
+
+    function prevOnboardingStep() {
+      if (currentOnbStep > 0) {
+        currentOnbStep--;
+        renderOnboardingStep();
+      }
+    }
+
+    function getFoodName(food) {
+      if (!food) return '';
+      if (currentLang === 'en' && food.name_en) return food.name_en;
+      if (currentLang === 'zh' && food.name_zh) return food.name_zh;
+      if (currentLang === 'es' && food.name_es) return food.name_es;
+      return food.name || '';
+    }
+
+    function toggleSettingsDropdown(event) {
+      if (event) event.stopPropagation();
+      const dd = document.getElementById('settings-dropdown');
+      dd.classList.toggle('hidden');
+    }
+
+    function setDisplayMode(mode) {
+      currentTheme = mode;
+      try {
+        localStorage.setItem('ke_theme', mode);
+      } catch(e) {}
+      applyTheme();
+    }
+
+    function setRetention(mode) {
+      currentRetention = mode;
+      try {
+        localStorage.setItem('ke_retention', mode);
+      } catch(e) {}
+      applyRetentionCleanup();
+      saveWeekHistory();
+      const sel = document.getElementById('retention-select');
+      if (sel && sel.value !== mode) sel.value = mode;
+    }
+
+    function applyTheme() {
+      const root = document.getElementById('html-root');
+      const meta = document.getElementById('meta-theme-color');
+      const themeSel = document.getElementById('theme-select');
+
+      if (currentTheme === 'dark') {
+        root.classList.add('dark');
+        if (meta) meta.setAttribute('content', '#020617');
+      } else {
+        root.classList.remove('dark');
+        if (meta) meta.setAttribute('content', '#ffffff');
+      }
+      if (themeSel) themeSel.value = currentTheme;
+    }
+
+    function selectLangFromDropdown(lang) {
+      setLanguage(lang);
+    }
+
+    window.addEventListener('click', (e) => {
+      const dd = document.getElementById('settings-dropdown');
+      const btn = document.getElementById('btn-settings-toggle');
+      if (dd && !dd.classList.contains('hidden')) {
+        if (!dd.contains(e.target) && !btn.contains(e.target)) {
+          dd.classList.add('hidden');
+        }
+      }
+    });
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      try {
+        localStorage.setItem('ke_lang', lang);
+      } catch(e) {}
+      updateUILanguage();
+      renderCategoryBar();
+      renderFoodGrid();
+      renderPlate();
+      updateCockpit();
+      renderSavedPlates();
+      renderDaysPlan();
+      updateTransferSelectDays();
+      lucide.createIcons();
+    }
+
+    function updateUILanguage() {
+      const langSel = document.getElementById('language-select');
+      if (langSel) langSel.value = currentLang;
+
+      const themeSel = document.getElementById('theme-select');
+      if (themeSel) themeSel.value = currentTheme;
+
+      const retentionSel = document.getElementById('retention-select');
+      if (retentionSel) retentionSel.value = currentRetention;
+
+      document.getElementById('ui-dropdown-title').textContent = currentLang === 'de' ? 'Sprache' : currentLang === 'en' ? 'Language' : currentLang === 'zh' ? '语言' : 'Idioma';
+      document.getElementById('ui-dropdown-display').textContent = t('themeTitle');
+      document.getElementById('ui-theme-light-lbl').textContent = t('themeLight');
+      document.getElementById('ui-theme-dark-lbl').textContent = t('themeDark');
+
+      document.getElementById('ui-menu-tutorial').textContent = t('menuTutorial');
+      document.getElementById('ui-menu-about').textContent = t('menuAbout');
+      document.getElementById('ui-dropdown-retention').textContent = t('retentionTitle');
+      document.getElementById('ui-ret-1y').textContent = t('ret1y');
+      document.getElementById('ui-ret-6m').textContent = t('ret6m');
+      document.getElementById('ui-ret-1m').textContent = t('ret1m');
+      document.getElementById('ui-ret-1w').textContent = t('ret1w');
+      document.getElementById('ui-ret-curr').textContent = t('retCurr');
+
+      document.getElementById('ui-btn-scan-lbl').textContent = t('scanBtn');
+
+      document.getElementById('ui-app-title').textContent = t('appTitle');
+      document.getElementById('ui-app-sub').textContent = t('appSub');
+
+      document.getElementById('nav-lbl-db').textContent = t('tabDb');
+      document.getElementById('nav-lbl-plate').textContent = t('tabPlate');
+      document.getElementById('nav-lbl-plan').textContent = t('tabPlan');
+
+      document.getElementById('ui-btn-new').textContent = t('btnNew');
+      document.getElementById('search-input').placeholder = t('searchPlaceholder');
+      document.getElementById('ui-my-plate').textContent = t('myPlate');
+      document.getElementById('ui-to-plan').textContent = t('toPlan');
+      document.getElementById('ui-clear-plate').textContent = t('clear');
+      document.getElementById('ui-save-fav-btn').textContent = t('saveFavBtn');
+      document.getElementById('ui-saved-plates-title').textContent = t('savedPlatesTitle');
+      document.getElementById('ui-save-plate-modal-title').textContent = t('savePlateModalTitle');
+      document.getElementById('ui-save-plate-lbl').textContent = t('savePlateLbl');
+      document.getElementById('ui-save-plate-submit').textContent = t('saveFavBtn');
+
+      document.getElementById('ui-lbl-amount').textContent = t('lblAmount');
+      document.getElementById('ui-lbl-kh').textContent = t('lblKh');
+      document.getElementById('ui-lbl-ke').textContent = t('lblKe');
+      document.getElementById('ui-lbl-be').textContent = t('lblBe');
+
+      document.getElementById('ui-week-plan-title').textContent = t('weekPlan');
+      document.getElementById('ui-btn-current-week').textContent = t('btnCurrentWeek');
+      document.getElementById('ui-week-from').textContent = t('weekFrom');
+      document.getElementById('ui-week-to').textContent = t('weekTo');
+
+      document.getElementById('ui-lbl-foodname').textContent = t('lblFoodName');
+      document.getElementById('ui-lbl-category').textContent = t('lblCategory');
+      document.getElementById('ui-lbl-unit').textContent = t('lblUnit');
+      document.getElementById('ui-opt-g').textContent = t('unitGramm');
+      document.getElementById('ui-opt-ml').textContent = t('unitMl');
+      document.getElementById('ui-lbl-kh100').textContent = t('lblKh100');
+      document.getElementById('ui-lbl-stdportion').textContent = t('lblStandardPortion');
+
+      document.getElementById('btn-modal-delete').textContent = t('btnDelete');
+      document.getElementById('ui-btn-cancel').textContent = t('btnCancel');
+      document.getElementById('ui-btn-save').textContent = t('btnSave');
+
+      document.getElementById('ui-transfer-title').textContent = t('transferModalTitle');
+      document.getElementById('ui-transfer-plate-lbl').textContent = t('transferPlatePreview');
+      document.getElementById('ui-transfer-select-day').textContent = t('selectDay');
+      document.getElementById('ui-transfer-select-meal').textContent = t('selectMeal');
+      document.getElementById('ui-btn-apply-transfer').textContent = t('btnApply');
+
+      document.getElementById('ui-del-tut-title').textContent = t('delTutTitle');
+      document.getElementById('ui-del-tut-desc').textContent = t('delTutDesc');
+      document.getElementById('ui-del-tut-btn').textContent = t('delTutBtn');
+
+      document.getElementById('ui-about-title').textContent = t('aboutTitle');
+      document.getElementById('ui-about-appname').textContent = t('aboutAppName');
+      document.getElementById('ui-about-desc').textContent = t('aboutDesc');
+      document.getElementById('ui-about-features-lbl').textContent = t('aboutFeaturesLbl');
+      document.getElementById('ui-about-features').textContent = t('aboutFeatures');
+      document.getElementById('ui-about-sources-lbl').textContent = t('aboutSourcesLbl');
+      document.getElementById('ui-about-sources').textContent = t('aboutSources');
+      document.getElementById('ui-about-privacy-lbl').textContent = t('aboutPrivacyLbl');
+      document.getElementById('ui-about-privacy').textContent = t('aboutPrivacy');
+      document.getElementById('ui-about-disclaimer-title').textContent = t('aboutDisclaimerTitle');
+      document.getElementById('ui-about-disclaimer').textContent = t('aboutDisclaimer');
+      document.getElementById('ui-about-close').textContent = t('aboutClose');
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      loadSavedPlates();
+      loadWeekHistoryData();
+      applyTheme();
+      updateUILanguage();
+      renderCategoryBar();
+      renderFoodGrid();
+      renderPlate();
+      updateCockpit();
+      renderSavedPlates();
+      renderDaysPlan();
+      updateTransferSelectDays();
+      lucide.createIcons();
+      checkOnboarding();
+    });
+
+    function switchTab(tabId) {
+      document.getElementById('tab-db').classList.toggle('hidden', tabId !== 'tab-db');
+      document.getElementById('tab-plate').classList.toggle('hidden', tabId !== 'tab-plate');
+      document.getElementById('tab-plan').classList.toggle('hidden', tabId !== 'tab-plan');
+
+      const btnDb = document.getElementById('nav-btn-db');
+      const btnPlate = document.getElementById('nav-btn-plate');
+      const btnPlan = document.getElementById('nav-btn-plan');
+
+      btnDb.className = 'flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all ' + (tabId === 'tab-db' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300');
+      btnPlate.className = 'flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all ' + (tabId === 'tab-plate' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300');
+      btnPlan.className = 'flex-1 flex flex-col items-center gap-1 py-1 rounded-xl transition-all ' + (tabId === 'tab-plan' ? 'text-indigo-600 dark:text-indigo-400 font-bold' : 'text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300');
+
+      lucide.createIcons();
+    }
+
+    function loadState() {
+      let savedFoods = null;
+      try {
+        savedFoods = localStorage.getItem('ke_foods');
+      } catch(e) {
+        savedFoods = null;
+      }
+
+      if (savedFoods) {
+        try {
+          const parsed = JSON.parse(savedFoods);
+          if (Array.isArray(parsed) && parsed.length > 20) {
+            const defaultMap = new Map(DEFAULT_FOODS.map(f => [f.id, f]));
+            foods = parsed.map(f => {
+              const def = defaultMap.get(f.id);
+              if (def) {
+                return {
+                  ...def,
+                  ...f,
+                  name_es: def.name_es || f.name_es,
+                  name_en: def.name_en || f.name_en,
+                  name_zh: def.name_zh || f.name_zh,
+                  geschwindigkeit: f.geschwindigkeit || def.geschwindigkeit || 'mittel',
+                  isFavorite: f.isFavorite !== undefined ? f.isFavorite : (def.isFavorite || false)
+                };
+              }
+              return { ...f, geschwindigkeit: f.geschwindigkeit || 'mittel', isFavorite: !!f.isFavorite };
+            });
+            saveFoods();
+          } else {
+            foods = DEFAULT_FOODS;
+            saveFoods();
+          }
+        } catch(e) {
+          foods = DEFAULT_FOODS;
+        }
+      } else {
+        foods = DEFAULT_FOODS;
+        saveFoods();
+      }
+
+      try {
+        let lokalerCache = JSON.parse(localStorage.getItem('meine_lebensmittel') || '{}');
+        for (const bc in lokalerCache) {
+          const prod = lokalerCache[bc];
+          if (!foods.some(f => f.id === prod.id)) {
+            foods.unshift(prod);
+          }
+        }
+      } catch(e) {}
+    }
+
+    function saveFoods() {
+      try {
+        localStorage.setItem('ke_foods', JSON.stringify(foods));
+      } catch(e) {}
+    }
+
+    // --- TELLERFAVORITEN LOGIC ---
+    function loadSavedPlates() {
+      try {
+        const stored = localStorage.getItem('ke_teller_favoriten');
+        if (stored) {
+          savedPlates = JSON.parse(stored);
+          if (!Array.isArray(savedPlates)) savedPlates = [];
+        }
+      } catch(e) {
+        savedPlates = [];
+      }
+    }
+
+    function saveSavedPlatesToStorage() {
+      try {
+        localStorage.setItem('ke_teller_favoriten', JSON.stringify(savedPlates));
+      } catch(e) {}
+    }
+
+    function openSavePlateModal() {
+      if (plate.length === 0) return;
+      document.getElementById('plate-name-input').value = '';
+      document.getElementById('save-plate-modal').classList.remove('hidden');
+      document.getElementById('plate-name-input').focus();
+    }
+
+    function closeSavePlateModal() {
+      document.getElementById('save-plate-modal').classList.add('hidden');
+    }
+
+    function executeSavePlateFavorite() {
+      const nameInput = document.getElementById('plate-name-input').value.trim();
+      const name = nameInput || `Mahlzeit ${new Date().toLocaleDateString()}`;
+
+      const newFav = {
+        id: 'plate_fav_' + Date.now(),
+        name: name,
+        items: JSON.parse(JSON.stringify(plate)),
+        date: new Date().toLocaleDateString()
+      };
+
+      savedPlates.unshift(newFav);
+      saveSavedPlatesToStorage();
+      renderSavedPlates();
+      closeSavePlateModal();
+      showCustomAlert(t('plateSavedMsg'));
+    }
+
+    function loadPlateFavorite(favId) {
+      const fav = savedPlates.find(p => p.id === favId);
+      if (!fav) return;
+
+      plate = JSON.parse(JSON.stringify(fav.items));
+      renderPlate();
+      updateCockpit();
+      switchTab('tab-plate');
+    }
+
+    function deletePlateFavorite(favId, event) {
+      if (event) event.stopPropagation();
+      showCustomConfirm(t('confirmDeletePlateFav'), () => {
+        savedPlates = savedPlates.filter(p => p.id !== favId);
+        saveSavedPlatesToStorage();
+        renderSavedPlates();
+      });
+    }
+
+    function renderSavedPlates() {
+      const container = document.getElementById('saved-plates-grid');
+      const countBadge = document.getElementById('saved-plates-count');
+
+      countBadge.textContent = savedPlates.length;
+
+      if (savedPlates.length === 0) {
+        container.innerHTML = `
+          <div class="py-6 text-center text-xs text-slate-400 dark:text-slate-500 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            ${t('emptySavedPlates')}
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = savedPlates.map(fav => {
+        let totalKH = 0;
+        let itemsSummary = fav.items.map(i => {
+          const kh = (i.amount * i.khPer100) / 100;
+          totalKH += kh;
+          return `${i.amount}${i.unit} ${getFoodName(i)}`;
+        }).join(', ');
+
+        const ke = (totalKH / 10).toFixed(1);
+        const be = (totalKH / 12).toFixed(1);
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 flex flex-col gap-2 shadow-xs transition-colors">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-900 dark:text-white whitespace-normal break-words">${fav.name}</span>
+              <div class="flex items-center gap-1.5">
+                <button onclick="loadPlateFavorite('${fav.id}')" class="px-3 h-7 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 text-indigo-600 dark:text-indigo-400 text-xs font-bold flex items-center gap-1 transition-colors">
+                  <i data-lucide="play" class="w-3 h-3"></i>
+                  <span>${t('loadPlate')}</span>
+                </button>
+                <button onclick="deletePlateFavorite('${fav.id}', event)" class="p-1 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 transition-colors" title="Löschen">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 whitespace-normal break-words leading-snug">${itemsSummary}</p>
+
+            <div class="flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800 text-[11px] font-mono-num text-slate-600 dark:text-slate-300">
+              <span>${totalKH.toFixed(1)}g KH</span>
+              <span class="font-bold text-indigo-600 dark:text-indigo-400">${ke} KE (${be} BE)</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function initEmptyPlan(mondayStr, sundayStr) {
+      const days = [];
+      for (let i = 0; i < 7; i++) {
+        const slots = [];
+        for (let s = 0; s < 7; s++) {
+          slots.push({ time: '', bz: '', kh: '', be: '', bolus: '', basal: '' });
+        }
+        days.push({
+          status: 'arbeitstag',
+          note: '',
+          slots: slots
+        });
+      }
+      return {
+        startDate: mondayStr,
+        endDate: sundayStr,
+        days: days
+      };
+    }
+
+    function getMondayOfCurrentWeek(d = new Date()) {
+      const date = new Date(d);
+      const day = date.getDay();
+      const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(date.setDate(diff));
+      monday.setHours(0,0,0,0);
+      return monday;
+    }
+
+    function formatDateISO(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}-${m}-${d}`;
+    }
+
+    function formatDateDE(date) {
+      const d = String(date.getDate()).padStart(2, '0');
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      return `${d}.${m}.`;
+    }
+
+    function applyRetentionCleanup() {
+      if (currentRetention === 'current') {
+        const currentMonday = formatDateISO(getMondayOfCurrentWeek());
+        const newHist = {};
+        if (weekHistory[currentMonday]) {
+          newHist[currentMonday] = weekHistory[currentMonday];
+        }
+        weekHistory = newHist;
+        return;
+      }
+
+      let maxDays = 365;
+      if (currentRetention === '6m') maxDays = 180;
+      if (currentRetention === '1m') maxDays = 30;
+      if (currentRetention === '1w') maxDays = 7;
+
+      const now = new Date().getTime();
+      const newHist = {};
+      for (const key in weekHistory) {
+        const weekDate = new Date(key).getTime();
+        const diffDays = (now - weekDate) / (1000 * 60 * 60 * 24);
+        if (diffDays <= maxDays + 10) {
+          newHist[key] = weekHistory[key];
+        }
+      }
+      weekHistory = newHist;
+    }
+
+    function loadWeekHistoryData() {
+      try {
+        const savedHist = localStorage.getItem('ke_week_history');
+        if (savedHist) {
+          weekHistory = JSON.parse(savedHist);
+        } else {
+          const legacyPlan = localStorage.getItem('ke_week_plan');
+          if (legacyPlan) {
+            const parsedLegacy = JSON.parse(legacyPlan);
+            if (parsedLegacy && parsedLegacy.startDate) {
+              weekHistory[parsedLegacy.startDate] = parsedLegacy;
+            }
+          }
+        }
+      } catch(e) {
+        weekHistory = {};
+      }
+
+      applyRetentionCleanup();
+
+      const monday = getMondayOfCurrentWeek();
+      const mondayStr = formatDateISO(monday);
+      loadWeekByMonday(mondayStr);
+    }
+
+    function saveWeekHistory() {
+      if (currentWeekKey && planData) {
+        weekHistory[currentWeekKey] = JSON.parse(JSON.stringify(planData));
+      }
+      applyRetentionCleanup();
+      try {
+        localStorage.setItem('ke_week_history', JSON.stringify(weekHistory));
+      } catch(e) {}
+    }
+
+    function loadWeekByMonday(mondayStr) {
+      if (currentWeekKey && planData) {
+        weekHistory[currentWeekKey] = JSON.parse(JSON.stringify(planData));
+      }
+
+      currentWeekKey = mondayStr;
+      const mondayDate = new Date(mondayStr);
+      const sundayDate = new Date(mondayDate);
+      sundayDate.setDate(mondayDate.getDate() + 6);
+
+      const startIso = formatDateISO(mondayDate);
+      const endIso = formatDateISO(sundayDate);
+
+      if (!weekHistory[mondayStr]) {
+        weekHistory[mondayStr] = initEmptyPlan(startIso, endIso);
+      }
+
+      planData = JSON.parse(JSON.stringify(weekHistory[mondayStr]));
+      planData.startDate = startIso;
+      planData.endDate = endIso;
+
+      document.getElementById('week-start-date').value = planData.startDate;
+      document.getElementById('week-end-date').value = planData.endDate;
+
+      saveWeekHistory();
+      renderDaysPlan();
+    }
+
+    function setTodayWeek() {
+      const monday = getMondayOfCurrentWeek();
+      loadWeekByMonday(formatDateISO(monday));
+    }
+
+    function navigateWeek(delta) {
+      saveWeekHistory();
+      const baseDate = new Date(planData.startDate || getMondayOfCurrentWeek());
+      baseDate.setDate(baseDate.getDate() + (delta * 7));
+      const monday = getMondayOfCurrentWeek(baseDate);
+      loadWeekByMonday(formatDateISO(monday));
+    }
+
+    function onDateInputChange() {
+      const startVal = document.getElementById('week-start-date').value;
+      if (!startVal) return;
+      const d = new Date(startVal);
+      if (isNaN(d.getTime())) return;
+      const monday = getMondayOfCurrentWeek(d);
+      loadWeekByMonday(formatDateISO(monday));
+    }
+
+    function getDayDate(dayIndex) {
+      if (!planData.startDate) return '';
+      const base = new Date(planData.startDate);
+      if (isNaN(base.getTime())) return '';
+      const target = new Date(base);
+      target.setDate(base.getDate() + dayIndex);
+      return formatDateDE(target);
+    }
+
+    function renderDaysPlan() {
+      const container = document.getElementById('days-container');
+      const daysNames = DAYS_DATA_MAP[currentLang] || DAYS_DATA_MAP.de;
+
+      container.innerHTML = daysNames.map((dayName, dayIndex) => {
+        const day = planData.days[dayIndex] || { status: 'arbeitstag', note: '', slots: [] };
+        const isArbeit = day.status === 'arbeitstag';
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3.5 shadow-xs flex flex-col gap-2.5 transition-colors">
+            
+            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-extrabold text-slate-800 dark:text-slate-100 tracking-wide uppercase">${dayName}</span>
+                <span class="text-[11px] font-mono-num font-semibold text-slate-400 dark:text-slate-500">${getDayDate(dayIndex)}</span>
+                ${isToday(dayIndex) ? `<span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-400 uppercase">${t('today')}</span>` : ''}
+              </div>
+              
+              <div class="flex items-center gap-2 text-[11px]">
+                <label class="flex items-center gap-1 cursor-pointer text-slate-600 dark:text-slate-400">
+                  <input type="radio" name="status-${dayIndex}" value="arbeitstag" ${isArbeit ? 'checked' : ''} onchange="updateDayStatus(${dayIndex}, 'arbeitstag')" class="accent-indigo-600">
+                  <span>${t('workday')}</span>
+                </label>
+                <label class="flex items-center gap-1 cursor-pointer text-slate-600 dark:text-slate-400">
+                  <input type="radio" name="status-${dayIndex}" value="urlaub" ${!isArbeit ? 'checked' : ''} onchange="updateDayStatus(${dayIndex}, 'urlaub')" class="accent-indigo-600">
+                  <span>${t('vacation')}</span>
+                </label>
+              </div>
+            </div>
+
+            <div>
+              <input type="text" placeholder="${t('notePlaceholder')}" 
+                     value="${day.note || ''}" 
+                     onchange="updateDayNote(${dayIndex}, this.value)"
+                     class="w-full text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1 text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors">
+            </div>
+
+            <div class="overflow-x-auto custom-scroll -mx-1 px-1 pb-1">
+              <table class="w-full text-center border-collapse table-fixed min-w-[500px]">
+                <colgroup>
+                  <col style="width: 72px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                  <col style="width: 61px;">
+                </colgroup>
+                <thead>
+                  <tr class="text-[10px] text-slate-400 dark:text-slate-500 border-b border-slate-200/80 dark:border-slate-800 uppercase">
+                    <th class="py-1.5 text-left font-bold text-slate-600 dark:text-slate-400 pl-1">${t('mealHeader')}</th>
+                    ${SLOTS_DEF.map((slotTitle) => `
+                      <th class="py-1.5 font-semibold text-slate-600 dark:text-slate-300 text-[10px] px-1 text-center whitespace-nowrap tracking-tight">${slotTitle}</th>
+                    `).join('')}
+                  </tr>
+                </thead>
+                <tbody class="text-xs font-mono-num text-slate-700 dark:text-slate-200 divide-y divide-slate-100 dark:divide-slate-800">
+                  <tr>
+                    <td class="text-left font-sans text-[10px] text-slate-400 dark:text-slate-500 py-1 pl-1 font-medium whitespace-nowrap">${t('rowTime')}</td>
+                    ${renderSlotInputs(dayIndex, 'time', 'type="text" placeholder="--:--" maxlength="5"')}
+                  </tr>
+                  <tr>
+                    <td class="text-left font-sans text-[10px] text-slate-700 dark:text-slate-300 py-1 pl-1 font-bold whitespace-nowrap">${t('rowBz')}</td>
+                    ${renderSlotInputs(dayIndex, 'bz', 'type="number" placeholder="-"')}
+                  </tr>
+                  <tr class="bg-amber-50/60 dark:bg-amber-950/20">
+                    <td class="text-left font-sans text-[10px] text-amber-800 dark:text-amber-400 py-1 pl-1 font-bold whitespace-nowrap">${t('rowKh')}</td>
+                    ${renderSlotInputs(dayIndex, 'kh', 'type="number" step="0.1" placeholder="-"', 'text-amber-800 dark:text-amber-300 font-bold')}
+                  </tr>
+                  <tr class="bg-indigo-50/50 dark:bg-indigo-950/20">
+                    <td class="text-left font-sans text-[10px] text-indigo-700 dark:text-indigo-300 py-1 pl-1 font-bold whitespace-nowrap">${t('rowBe')}</td>
+                    ${renderSlotInputs(dayIndex, 'be', 'type="number" step="0.1" placeholder="-"', 'text-indigo-600 dark:text-indigo-400 font-bold')}
+                  </tr>
+                  <tr>
+                    <td class="text-left font-sans text-[10px] text-slate-500 dark:text-slate-400 py-1 pl-1 font-medium whitespace-nowrap">${t('rowBolus')}</td>
+                    ${renderSlotInputs(dayIndex, 'bolus', 'type="number" step="0.5" placeholder="-"')}
+                  </tr>
+                  <tr>
+                    <td class="text-left font-sans text-[10px] text-slate-500 dark:text-slate-400 py-1 pl-1 font-medium whitespace-nowrap">${t('rowBasal')}</td>
+                    ${renderSlotInputs(dayIndex, 'basal', 'type="number" step="0.5" placeholder="-"')}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderSlotInputs(dayIndex, field, extraAttrs = '', extraClass = '') {
+      const day = planData.days[dayIndex];
+      let html = '';
+      for (let s = 0; s < 7; s++) {
+        const val = (day && day.slots && day.slots[s]) ? (day.slots[s][field] || '') : '';
+        html += `
+          <td class="p-0.5 text-center">
+            <input ${extraAttrs} value="${val}"
+                   onchange="updateSlotCell(${dayIndex}, ${s}, '${field}', this.value)"
+                   class="w-full text-center h-7 px-0.5 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] ${extraClass} focus:bg-white dark:focus:bg-slate-700 focus:outline-none focus:border-indigo-500 transition-colors">
+          </td>
+        `;
+      }
+      return html;
+    }
+
+    function updateDayStatus(dayIdx, status) {
+      planData.days[dayIdx].status = status;
+      saveWeekHistory();
+    }
+
+    function updateDayNote(dayIdx, note) {
+      planData.days[dayIdx].note = note;
+      saveWeekHistory();
+    }
+
+    function updateSlotCell(dayIdx, slotIdx, field, val) {
+      if (!planData.days[dayIdx].slots[slotIdx]) {
+        planData.days[dayIdx].slots[slotIdx] = { time: '', bz: '', kh: '', be: '', bolus: '', basal: '' };
+      }
+      planData.days[dayIdx].slots[slotIdx][field] = val;
+      saveWeekHistory();
+    }
+
+    function isToday(dayIndex) {
+      const now = new Date();
+      let currentDayIdx = now.getDay() - 1;
+      if (currentDayIdx < 0) currentDayIdx = 6;
+      if (dayIndex !== currentDayIdx) return false;
+      
+      if (!planData.startDate) return false;
+      const monday = getMondayOfCurrentWeek(now);
+      return planData.startDate === formatDateISO(monday);
+    }
+
+    function suggestSlotForCurrentTime() {
+      const h = new Date().getHours();
+      const m = new Date().getMinutes();
+      const timeVal = h + m / 60;
+      if (timeVal < 9.5) return 0;
+      if (timeVal < 11.5) return 1;
+      if (timeVal < 13.5) return 2;
+      if (timeVal < 16.5) return 3;
+      if (timeVal < 19.5) return 4;
+      if (timeVal < 22.0) return 5;
+      return 6;
+    }
+
+    function resetWholeWeek() {
+      showCustomConfirm(t('confirmResetWeek'), () => {
+        const monday = getMondayOfCurrentWeek(new Date(planData.startDate || new Date()));
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        planData = initEmptyPlan(formatDateISO(monday), formatDateISO(sunday));
+        saveWeekHistory();
+        renderDaysPlan();
+      });
+    }
+
+    function printOrExportPlan() {
+      window.print();
+    }
+
+    function updateTransferSelectDays() {
+      const select = document.getElementById('transfer-day-select');
+      const daysNames = DAYS_DATA_MAP[currentLang] || DAYS_DATA_MAP.de;
+      select.innerHTML = daysNames.map((d, i) => `<option value="${i}">${d}</option>`).join('');
+    }
+
+    function transferPlateToLog() {
+      let totalKH = 0;
+      plate.forEach(item => {
+        totalKH += (item.amount * item.khPer100) / 100;
+      });
+      const ke = (totalKH / 10).toFixed(1);
+      const be = (totalKH / 12).toFixed(1);
+
+      document.getElementById('transfer-ke-preview').textContent = `${totalKH.toFixed(1)} g ${t('lblKh')} | ${ke} KE (${be} BE)`;
+      
+      const now = new Date();
+      let dayIndex = now.getDay() - 1;
+      if (dayIndex < 0) dayIndex = 6;
+      updateTransferSelectDays();
+      document.getElementById('transfer-day-select').value = dayIndex;
+      document.getElementById('transfer-slot-select').value = suggestSlotForCurrentTime();
+
+      document.getElementById('transfer-modal').classList.remove('hidden');
+    }
+
+    function closeTransferModal() {
+      document.getElementById('transfer-modal').classList.add('hidden');
+    }
+
+    function executeTransfer() {
+      const dayIdx = parseInt(document.getElementById('transfer-day-select').value, 10);
+      const slotIdx = parseInt(document.getElementById('transfer-slot-select').value, 10);
+
+      let totalKH = 0;
+      plate.forEach(item => {
+        totalKH += (item.amount * item.khPer100) / 100;
+      });
+      const ke = (totalKH / 10).toFixed(1);
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+      if (!planData.days[dayIdx].slots[slotIdx].time) {
+        planData.days[dayIdx].slots[slotIdx].time = timeStr;
+      }
+      planData.days[dayIdx].slots[slotIdx].kh = totalKH.toFixed(1);
+      planData.days[dayIdx].slots[slotIdx].be = ke;
+
+      lastTransferredSlot = { weekKey: currentWeekKey, dayIdx, slotIdx };
+
+      saveWeekHistory();
+      renderDaysPlan();
+      closeTransferModal();
+
+      switchTab('tab-plan');
+    }
+
+    function renderCategoryBar() {
+      const bar = document.getElementById('category-bar');
+      const cats = CATEGORIES_MAP[currentLang] || CATEGORIES_MAP.de;
+      
+      bar.innerHTML = cats.map(c => {
+        let count = 0;
+        if (c.id === 'all') {
+          count = foods.length;
+        } else if (c.id === 'favoriten') {
+          count = foods.filter(f => f.isFavorite).length;
+        } else {
+          count = foods.filter(f => f.cat === c.id).length;
+        }
+
+        const isActive = currentCategory === c.id;
+
+        return `
+          <button onclick="setCategory('${c.id}')" class="px-2.5 py-1 rounded-xl text-[11px] font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+            isActive 
+              ? 'bg-indigo-600 text-white shadow-sm' 
+              : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
+          }">
+            <span>${c.name}</span>
+            <span class="px-1.5 py-0.2 rounded-full text-[9px] font-mono-num font-bold ${
+              isActive 
+                ? 'bg-indigo-500/80 text-white' 
+                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
+            }">${count}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function setCategory(catId) {
+      currentCategory = catId;
+      renderCategoryBar();
+      renderFoodGrid();
+    }
+
+    function toggleFavorite(foodId, event) {
+      if (event) event.stopPropagation();
+      const food = foods.find(f => f.id === foodId);
+      if (food) {
+        food.isFavorite = !food.isFavorite;
+        saveFoods();
+        renderFoodGrid();
+        renderCategoryBar();
+      }
+    }
+
+    function onSearchInput(val) {
+      searchQuery = val.trim().toLowerCase();
+      document.getElementById('btn-clear-search').classList.toggle('hidden', searchQuery.length === 0);
+      renderFoodGrid();
+    }
+
+    function clearSearch() {
+      document.getElementById('search-input').value = '';
+      onSearchInput('');
+    }
+
+    function getFilteredFoods() {
+      return foods.filter(f => {
+        let matchCat = false;
+        if (currentCategory === 'all') {
+          matchCat = true;
+        } else if (currentCategory === 'favoriten') {
+          matchCat = !!f.isFavorite;
+        } else {
+          matchCat = f.cat === currentCategory;
+        }
+
+        const nameLocalized = getFoodName(f).toLowerCase();
+        const matchQuery = !searchQuery || nameLocalized.includes(searchQuery) || f.name.toLowerCase().includes(searchQuery) || (f.barcode && f.barcode.includes(searchQuery));
+        return matchCat && matchQuery;
+      });
+    }
+
+    function handleFoodTouchStart(foodId) {
+      longPressTimer = setTimeout(() => {
+        triggerFoodLongPressDelete(foodId);
+      }, 1000);
+    }
+
+    function handleFoodTouchEnd() {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+    }
+
+    function triggerFoodLongPressDelete(foodId) {
+      pendingDeleteFoodId = foodId;
+      
+      let tutShown = false;
+      try {
+        tutShown = localStorage.getItem('ke_del_tutorial_shown');
+      } catch(e) {}
+
+      if (!tutShown) {
+        try {
+          localStorage.setItem('ke_del_tutorial_shown', 'true');
+        } catch(e) {}
+        document.getElementById('del-tutorial-modal').classList.remove('hidden');
+        lucide.createIcons();
+      } else {
+        confirmAndDeleteFood(foodId);
+      }
+    }
+
+    function closeDelTutorial() {
+      document.getElementById('del-tutorial-modal').classList.add('hidden');
+      if (pendingDeleteFoodId) {
+        confirmAndDeleteFood(pendingDeleteFoodId);
+      }
+    }
+
+    function confirmAndDeleteFood(foodId) {
+      const food = foods.find(f => f.id === foodId);
+      if (!food) return;
+
+      showCustomConfirm(t('confirmDeleteFood'), () => {
+        foods = foods.filter(f => f.id !== foodId);
+        saveFoods();
+        renderFoodGrid();
+        renderCategoryBar();
+        pendingDeleteFoodId = null;
+      });
+    }
+
+    function renderFoodGrid() {
+      const grid = document.getElementById('food-grid');
+      let filtered = getFilteredFoods();
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-2 py-8 text-center text-xs text-slate-400 dark:text-slate-500">
+            ${t('noFoodsFound')}
+          </div>
+        `;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(f => {
+        const displayName = getFoodName(f);
+        const isFav = !!f.isFavorite;
+        
+        let speedBadge = '';
+        if (f.geschwindigkeit === 'schnell') speedBadge = '<span class="text-[9px] text-amber-600 dark:text-amber-400 font-semibold" title="Schnelle Resonanz">⚡ schnell</span>';
+        else if (f.geschwindigkeit === 'langsam') speedBadge = '<span class="text-[9px] text-emerald-600 dark:text-emerald-400 font-semibold" title="Langsame Resonanz">🐢 langsam</span>';
+        else speedBadge = '<span class="text-[9px] text-slate-500 dark:text-slate-400 font-semibold" title="Mittlere Resonanz">⏱️ mittel</span>';
+
+        return `
+          <div class="group relative bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-600 active:scale-[0.98] transition-all p-2.5 rounded-2xl flex flex-col justify-between cursor-pointer shadow-sm select-none"
+               onclick="addFoodToPlate('${f.id}')"
+               onmousedown="handleFoodTouchStart('${f.id}')"
+               onmouseup="handleFoodTouchEnd()"
+               onmouseleave="handleFoodTouchEnd()"
+               ontouchstart="handleFoodTouchStart('${f.id}')"
+               ontouchend="handleFoodTouchEnd()"
+               ontouchcancel="handleFoodTouchEnd()">
+            
+            <div class="flex items-start justify-between gap-1">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-100 whitespace-normal break-words leading-snug">${displayName}</span>
+              <div class="flex items-center gap-0.5 shrink-0">
+                <button onclick="toggleFavorite('${f.id}', event)" class="p-1 rounded-lg text-slate-400 hover:text-amber-500 dark:hover:text-amber-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Favorit">
+                  <i data-lucide="star" class="w-3.5 h-3.5 ${isFav ? 'text-amber-500 fill-amber-500' : 'text-slate-300 dark:text-slate-600'}"></i>
+                </button>
+                <button onclick="event.stopPropagation(); openEditModal('${f.id}')" class="p-1 rounded-lg text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                  <i data-lucide="pencil" class="w-3 h-3"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-end justify-between mt-2">
+              <div class="flex flex-col">
+                <span class="text-[10px] text-slate-400 dark:text-slate-500 font-mono-num">${f.kh.toFixed(1)}g ${t('lblKh')} / 100${f.unit}</span>
+                <span class="text-[11px] font-bold text-slate-700 dark:text-slate-300 font-mono-num">${f.portion}${f.unit}</span>
+              </div>
+              <div>${speedBadge}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function addFoodToPlate(foodId) {
+      const food = foods.find(f => f.id === foodId);
+      if (!food) return;
+
+      const existingIndex = plate.findIndex(p => p.id === foodId);
+      if (existingIndex > -1) {
+        plate[existingIndex].amount += food.portion;
+      } else {
+        plate.push({
+          id: food.id,
+          name: food.name,
+          name_en: food.name_en,
+          name_zh: food.name_zh,
+          name_es: food.name_es,
+          khPer100: food.kh,
+          unit: food.unit,
+          amount: food.portion,
+          geschwindigkeit: food.geschwindigkeit || 'mittel'
+        });
+      }
+      renderPlate();
+      updateCockpit();
+    }
+
+    function renderPlate() {
+      const list = document.getElementById('plate-list');
+      const countBadge = document.getElementById('plate-count-badge');
+      const navBadge = document.getElementById('nav-plate-badge');
+      const clearBtn = document.getElementById('btn-clear-plate');
+      const transferBtn = document.getElementById('btn-transfer-log');
+      const saveFavBtn = document.getElementById('btn-save-plate-fav');
+
+      countBadge.textContent = plate.length;
+      if (plate.length > 0) {
+        navBadge.textContent = plate.length;
+        navBadge.classList.remove('hidden');
+        saveFavBtn.classList.remove('hidden');
+      } else {
+        navBadge.classList.add('hidden');
+        saveFavBtn.classList.add('hidden');
+      }
+
+      clearBtn.classList.toggle('hidden', plate.length === 0);
+      transferBtn.classList.toggle('hidden', plate.length === 0);
+
+      if (plate.length === 0) {
+        list.innerHTML = `
+          <div class="py-10 text-center text-xs text-slate-400 dark:text-slate-500 flex flex-col items-center justify-center gap-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
+            <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400">
+              <i data-lucide="utensils" class="w-6 h-6"></i>
+            </div>
+            <span>${t('emptyPlate')}</span>
+            <span class="text-[11px] text-slate-400 dark:text-slate-500">${t('tapHint')}</span>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = plate.map((item, index) => {
+        const itemKH = ((item.amount * item.khPer100) / 100).toFixed(1);
+        const itemKE = (itemKH / 10).toFixed(1);
+        const displayName = getFoodName(item);
+
+        return `
+          <div class="bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 flex flex-col gap-2 shadow-sm transition-colors">
+            
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-800 dark:text-slate-100 whitespace-normal break-words leading-snug">${displayName}</span>
+              <div class="flex items-center gap-2">
+                <span id="label-item-calc-${index}" class="text-xs font-mono-num text-indigo-600 dark:text-indigo-400 font-bold">${itemKH}g ${t('lblKh')} (${itemKE} KE)</span>
+                <button onclick="removePlateItem(${index})" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1">
+                  <i data-lucide="trash-2" class="w-4 h-4"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <input type="range" min="1" max="600" step="1" value="${item.amount}" 
+                     id="slider-${index}"
+                     oninput="onSliderMove(${index}, this.value)"
+                     class="flex-1">
+              <div class="flex items-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2 py-0.5 shrink-0">
+                <input type="number" min="1" max="999" value="${item.amount}"
+                       id="input-${index}"
+                       onchange="onManualInputAmount(${index}, this.value)"
+                       class="w-10 text-center font-mono-num font-bold text-xs bg-transparent text-slate-850 dark:text-slate-100 focus:outline-none">
+                <span class="text-[10px] text-slate-400 dark:text-slate-500">${item.unit}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-1.5 pt-0.5">
+              <button onclick="nudgeAmount(${index}, -10)" class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-mono-num text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">-10</button>
+              <button onclick="nudgeAmount(${index}, -1)" class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-mono-num text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">-1</button>
+              <button onclick="nudgeAmount(${index}, 1)" class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-mono-num text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">+1</button>
+              <button onclick="nudgeAmount(${index}, 10)" class="px-2 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-mono-num text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700">+10</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function onSliderMove(index, val) {
+      const amount = parseInt(val, 10) || 1;
+      plate[index].amount = amount;
+      
+      const numInput = document.getElementById(`input-${index}`);
+      if (numInput) numInput.value = amount;
+
+      const itemKH = ((amount * plate[index].khPer100) / 100).toFixed(1);
+      const itemKE = (itemKH / 10).toFixed(1);
+      const calcLabel = document.getElementById(`label-item-calc-${index}`);
+      if (calcLabel) calcLabel.textContent = `${itemKH}g ${t('lblKh')} (${itemKE} KE)`;
+
+      updateCockpit();
+    }
+
+    function onManualInputAmount(index, val) {
+      let amount = parseInt(val, 10);
+      if (isNaN(amount) || amount < 1) amount = 1;
+      plate[index].amount = amount;
+      
+      const slider = document.getElementById(`slider-${index}`);
+      if (slider) slider.value = Math.min(amount, 600);
+
+      onSliderMove(index, amount);
+    }
+
+    function nudgeAmount(index, delta) {
+      let newAmount = (plate[index].amount || 0) + delta;
+      if (newAmount < 1) newAmount = 1;
+      onManualInputAmount(index, newAmount);
+    }
+
+    function removePlateItem(index) {
+      plate.splice(index, 1);
+      renderPlate();
+      updateCockpit();
+    }
+
+    function clearPlate() {
+      if (lastTransferredSlot && lastTransferredSlot.weekKey === currentWeekKey) {
+        const { dayIdx, slotIdx } = lastTransferredSlot;
+        if (planData.days[dayIdx] && planData.days[dayIdx].slots[slotIdx]) {
+          planData.days[dayIdx].slots[slotIdx].time = '';
+          planData.days[dayIdx].slots[slotIdx].kh = '';
+          planData.days[dayIdx].slots[slotIdx].be = '';
+          saveWeekHistory();
+          renderDaysPlan();
+        }
+        lastTransferredSlot = null;
+      }
+
+      plate = [];
+      renderPlate();
+      updateCockpit();
+    }
+
+    function updateCockpit() {
+      let totalAmount = 0;
+      let totalKH = 0;
+
+      plate.forEach(item => {
+        totalAmount += item.amount;
+        totalKH += (item.amount * item.khPer100) / 100;
+      });
+
+      const ke = totalKH / 10;
+      const be = totalKH / 12;
+
+      document.getElementById('stat-total-amount').textContent = `${Math.round(totalAmount)}`;
+      document.getElementById('stat-total-kh').textContent = `${totalKH.toFixed(1)} g`;
+      document.getElementById('stat-ke').textContent = ke.toFixed(1);
+      document.getElementById('stat-be').textContent = be.toFixed(1);
+    }
+
+    function openEditModal(foodId) {
+      currentEditingId = foodId;
+      const modal = document.getElementById('edit-modal');
+      const catSelect = document.getElementById('modal-category');
+      const cats = CATEGORIES_MAP[currentLang] || CATEGORIES_MAP.de;
+      
+      catSelect.innerHTML = cats.filter(c => c.id !== 'all' && c.id !== 'favoriten').map(c => `
+        <option value="${c.id}">${c.name}</option>
+      `).join('');
+
+      if (foodId) {
+        const item = foods.find(f => f.id === foodId);
+        if (!item) return;
+        document.getElementById('modal-title').textContent = t('modalEditTitle');
+        document.getElementById('modal-name').value = getFoodName(item);
+        document.getElementById('modal-category').value = item.cat;
+        document.getElementById('modal-unit').value = item.unit;
+        document.getElementById('modal-kh').value = item.kh;
+        document.getElementById('modal-portion').value = item.portion;
+        document.getElementById('modal-speed').value = item.geschwindigkeit || 'mittel';
+        document.getElementById('btn-modal-delete').classList.remove('hidden');
+      } else {
+        document.getElementById('modal-title').textContent = t('modalNewTitle');
+        document.getElementById('modal-name').value = '';
+        document.getElementById('modal-category').value = 'fastfood';
+        document.getElementById('modal-unit').value = 'g';
+        document.getElementById('modal-kh').value = '';
+        document.getElementById('modal-portion').value = '100';
+        document.getElementById('modal-speed').value = 'mittel';
+        document.getElementById('btn-modal-delete').classList.add('hidden');
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeEditModal() {
+      document.getElementById('edit-modal').classList.add('hidden');
+      currentEditingId = null;
+    }
+
+    function saveFoodModal() {
+      const name = document.getElementById('modal-name').value.trim();
+      const cat = document.getElementById('modal-category').value;
+      const unit = document.getElementById('modal-unit').value;
+      const kh = parseFloat(document.getElementById('modal-kh').value);
+      const portion = parseInt(document.getElementById('modal-portion').value, 10) || 100;
+      const geschwindigkeit = document.getElementById('modal-speed').value;
+
+      if (!name || isNaN(kh)) {
+        showCustomAlert(t('validationAlert'));
+        return;
+      }
+
+      if (currentEditingId) {
+        const idx = foods.findIndex(f => f.id === currentEditingId);
+        if (idx > -1) {
+          const item = foods[idx];
+          if (currentLang === 'en') item.name_en = name;
+          else if (currentLang === 'zh') item.name_zh = name;
+          else if (currentLang === 'es') item.name_es = name;
+          else item.name = name;
+          foods[idx] = { ...item, cat, unit, kh, portion, geschwindigkeit };
+        }
+      } else {
+        const newId = 'custom_' + Date.now();
+        const newItem = { id: newId, name, cat, unit, kh, portion, geschwindigkeit, isFavorite: false };
+        if (currentLang === 'en') newItem.name_en = name;
+        if (currentLang === 'zh') newItem.name_zh = name;
+        if (currentLang === 'es') newItem.name_es = name;
+        foods.unshift(newItem);
+      }
+
+      saveFoods();
+      renderFoodGrid();
+      renderCategoryBar();
+      closeEditModal();
+    }
+
+    function deleteFoodFromModal() {
+      if (!currentEditingId) return;
+      showCustomConfirm(t('confirmDeleteFood'), () => {
+        foods = foods.filter(f => f.id !== currentEditingId);
+        saveFoods();
+        renderFoodGrid();
+        renderCategoryBar();
+        closeEditModal();
+      });
+    }
+  </script>
+
+  <!-- PWA Service Worker Inline Registrierung -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      const swCode = `
+        const CACHE_NAME = 'ke-rechner-intl-v49';
+        self.addEventListener('install', e => self.skipWaiting());
+        self.addEventListener('activate', e => self.clients.claim());
+        self.addEventListener('fetch', e => {
+          e.respondWith(
+            fetch(e.request).catch(() => caches.match(e.request))
+          );
+        });
+      `;
+      try {
+        const blob = new Blob([swCode], { type: 'application/javascript' });
+        navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+      } catch(e) {}
+    }
+  </script>
+</body>
+</html>
