@@ -515,14 +515,14 @@
       <div class="overflow-y-auto custom-scroll flex flex-col gap-3 pr-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
         <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
           <span class="font-bold text-slate-800 dark:text-slate-100" id="ui-about-appname">KE/BE Teller-Rechner & Wochenprotokoll</span>
-          <span class="text-[10px] font-mono-num font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">v4.9 PWA</span>
+          <span class="text-[10px] font-mono-num font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">v5.0 PWA</span>
         </div>
 
         <p id="ui-about-desc">Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung, Blutzuckerdokumentation und Tellerfavoriten-Verwaltung.</p>
 
         <div>
           <span class="font-bold text-slate-800 dark:text-slate-100 block mb-1" id="ui-about-features-lbl">Hauptfunktionen:</span>
-          <p id="ui-about-features">Umfassende OFF-Datenbank mit reinen Markenprodukten & Klassikern (Milka, Nutella, Haribo, Alpro, Philadelphia, McDonald's, Burger King, Subway u.v.m.), Live-Barcode-Scanner, Favoriten an 2. Stelle, Tellerfavoriten (Gespeicherte Teller) und fortlaufendem Wochenprotokoll.</p>
+          <p id="ui-about-features">Umfassende OFF-Datenbank mit reinen Markenprodukten, Fastfood, erweiterter Obst-Kategorie (60+ Obstsorten inkl. Beeren, Exoten, Trockenfrüchten), Favoriten an 2. Stelle, Tellerfavoriten und fortlaufendem Wochenprotokoll.</p>
         </div>
 
         <div>
@@ -587,6 +587,7 @@
     let longPressTimer = null;
     let pendingDeleteFoodId = null;
     let savedPlates = [];
+    let plate = [];
 
     const I18N = {
       de: {
@@ -672,13 +673,13 @@
         aboutAppName: "KE/BE Teller-Rechner & Wochenprotokoll",
         aboutDesc: "Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung und Blutzuckerdokumentation.",
         aboutFeaturesLbl: "Hauptfunktionen:",
-        aboutFeatures: "Umfassende OFF-Datenbank mit sauberen Markenprodukten, Fastfood, Wurst-, Milch- und Backwaren, Favoriten an 2. Stelle, Tellerfavoriten und Wochenprotokoll.",
+        aboutFeatures: "Umfassende OFF-Datenbank mit sauberen Markenprodukten, Fastfood, erweiterter Obst-Kategorie (60+ Obstsorten inkl. Beeren & Exoten), Favoriten an 2. Stelle, Tellerfavoriten und Wochenprotokoll.",
         aboutSourcesLbl: "Datenquellen & Lizenzen:",
         aboutSources: "Produktdaten & Barcodes: Bereitgestellt durch Open Food Facts (Community-Datenbank). Lizenziert unter der Open Database License (ODbL).",
         aboutPrivacyLbl: "Datenschutz:",
         aboutPrivacy: "Alle Daten werden ausschließlich lokal auf Ihrem Endgerät im Browser (localStorage) gespeichert.",
         aboutDisclaimerTitle: "Medizinischer Haftungsausschluss",
-        aboutDisclaimer: "Diese App dient ausschließlich zu Informations- und Dokumentationszwecken und ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung durch einen Arzt oder Diabetesberater. Berechnungen für Insulin (Bolus/Basal) und Kohlenhydrate müssen stets eigenverantwortlich geprüft werden. Der Entwickler übernimmt keine Haftung für Therapieentscheidungen oder gesundheitliche Schäden.",
+        aboutDisclaimer: "Diese App dient ausschließlich zu Informations- und Dokumentationszwecken und ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung durch einen Arzt oder Diabetesberater. Berechnungen für Insulin und Kohlenhydrate müssen stets eigenverantwortlich geprüft werden. Der Entwickler übernimmt keine Haftung für Therapieentscheidungen oder gesundheitliche Schäden.",
         aboutClose: "Schließen",
         delTutTitle: "Lösch-Geste entdeckt!",
         delTutDesc: "Du hast ein Lebensmittel 1 Sekunde lang gedrückt gehalten. So kannst du selbst hinzugefügte oder gescannte Lebensmittel ganz einfach aus der Liste löschen.",
@@ -687,7 +688,7 @@
           {
             icon: "book-open",
             title: "1. Datenbank & Favoriten",
-            desc: "Durchsuche hunderte Lebensmittel. Markiere Favoriten mit dem Stern, um sie direkt in der 2. Kategorie zu finden."
+            desc: "Durchsuche hunderte Lebensmittel & 60+ Obstsorten. Markiere Favoriten mit dem Stern, um sie direkt in der 2. Kategorie zu finden."
           },
           {
             icon: "utensils",
@@ -792,7 +793,7 @@
         aboutAppName: "Carb Calculator & Weekly Log",
         aboutDesc: "The Carb Calculator & Weekly Log helps people with diabetes with daily carbohydrate counting and blood glucose documentation.",
         aboutFeaturesLbl: "Key Features:",
-        aboutFeatures: "Expanded OFF database with clean brand items, barcode scanner, fast food, favorites quick access, saved plate favorites, weekly log.",
+        aboutFeatures: "Expanded OFF database with clean brand items, barcode scanner, fast food, extended fruit category (60+ fruits), favorites quick access, saved plate favorites, weekly log.",
         aboutSourcesLbl: "Data Sources & Licenses:",
         aboutSources: "Product data & barcodes: Provided by Open Food Facts (community database). Licensed under the Open Database License (ODbL).",
         aboutPrivacyLbl: "Privacy:",
@@ -807,7 +808,7 @@
           {
             icon: "book-open",
             title: "1. Database & Favorites",
-            desc: "Browse hundreds of items. Star favorites to find them instantly in the 2nd category."
+            desc: "Browse hundreds of items & 60+ fruits. Star favorites to find them instantly in the 2nd category."
           },
           {
             icon: "utensils",
@@ -912,7 +913,7 @@
         aboutAppName: "碳水计算器与周日志",
         aboutDesc: "碳水计算器与周日志旨在帮助糖尿病患者进行日常碳水化合物计算和血糖记录。",
         aboutFeaturesLbl: "主要功能：",
-        aboutFeatures: "包含精选知名品牌与产品的OFF数据库、条码扫描、快餐、收藏夹、餐盘收藏、周日志。",
+        aboutFeatures: "包含精选知名品牌、快餐、60+种水果分类（含浆果、热带水果与干果）、收藏夹、餐盘收藏、周日志的OFF数据库。",
         aboutSourcesLbl: "数据来源与许可：",
         aboutSources: "产品数据与条形码：由 Open Food Facts（社区数据库）提供。依据 Open Database License (ODbL) 授权许可。",
         aboutPrivacyLbl: "隐私政策：",
@@ -927,7 +928,7 @@
           {
             icon: "book-open",
             title: "1. 数据库与收藏夹",
-            desc: "浏览上百种食物。点击星标收藏喜欢的食物，即可在第2个分类快速找到。"
+            desc: "浏览上百种食物与60+种水果。点击星标收藏喜欢的食物，即可在第2个分类快速找到。"
           },
           {
             icon: "utensils",
@@ -1032,7 +1033,7 @@
         aboutAppName: "Calculadora de Raciones y Registro Semanal",
         aboutDesc: "La Calculadora de Raciones y Registro Semanal ayuda a las personas con diabetes en el cálculo diario de carbohidratos y el registro de glucemia.",
         aboutFeaturesLbl: "Características principales:",
-        aboutFeatures: "Base de datos OFF con productos de marca limpios, escáner, fast food, favoritos, platos favoritos guardados, registro semanal.",
+        aboutFeatures: "Base de datos OFF con productos de marca, fast food, categoría de fruta ampliada (60+ frutas, bayas y frutos secos), favoritos, platos favoritos guardados, registro semanal.",
         aboutSourcesLbl: "Fuentes de datos y licencias:",
         aboutSources: "Datos y códigos de barras: Proporcionados por Open Food Facts (comunidad). Licenciados bajo ODbL.",
         aboutPrivacyLbl: "Privacidad:",
@@ -1047,7 +1048,7 @@
           {
             icon: "book-open",
             title: "1. Base de datos y Favoritos",
-            desc: "Explora cientos de alimentos. Marca favoritos para encontrarlos al instante en la 2ª categoría."
+            desc: "Explora cientos de alimentos y 60+ frutas. Marca favoritos para encontrarlos al instante en la 2ª categoría."
           },
           {
             icon: "utensils",
@@ -1088,7 +1089,7 @@
         { id: 'aufstriche', name: '🍫 Süßes & Aufstriche' },
         { id: 'brot', name: '🍞 Brot & Getreide' },
         { id: 'cerealien', name: '🥣 Cerealien' },
-        { id: 'obst', name: '🍎 Obst' },
+        { id: 'obst', name: '🍎 Obst (60+)' },
         { id: 'gemuese', name: '🥦 Gemüse' },
         { id: 'getraenke', name: '🥤 Getränke' },
         { id: 'gerichte', name: '🍕 Fertiggerichte' },
@@ -1103,7 +1104,7 @@
         { id: 'aufstriche', name: '🍫 Sweets & Spreads' },
         { id: 'brot', name: '🍞 Bread & Grains' },
         { id: 'cerealien', name: '🥣 Cereals' },
-        { id: 'obst', name: '🍎 Fruit' },
+        { id: 'obst', name: '🍎 Fruit (60+)' },
         { id: 'gemuese', name: '🥦 Vegetables' },
         { id: 'getraenke', name: '🥤 Drinks' },
         { id: 'gerichte', name: '🍕 Ready Meals' },
@@ -1118,7 +1119,7 @@
         { id: 'aufstriche', name: '🍫 甜品与酱料' },
         { id: 'brot', name: '🍞 面包烘焙' },
         { id: 'cerealien', name: '🥣 谷物麦片' },
-        { id: 'obst', name: '🍎 水果' },
+        { id: 'obst', name: '🍎 水果 (60+)' },
         { id: 'gemuese', name: '🥦 蔬菜豆类' },
         { id: 'getraenke', name: '🥤 饮品' },
         { id: 'gerichte', name: '🍕 预制正餐' },
@@ -1133,7 +1134,7 @@
         { id: 'aufstriche', name: '🍫 Dulces y Untables' },
         { id: 'brot', name: '🍞 Panadería' },
         { id: 'cerealien', name: '🥣 Cereales' },
-        { id: 'obst', name: '🍎 Frutas' },
+        { id: 'obst', name: '🍎 Frutas (60+)' },
         { id: 'gemuese', name: '🥦 Verduras' },
         { id: 'getraenke', name: '🥤 Bebidas' },
         { id: 'gerichte', name: '🍕 Platos Preparados' },
@@ -1178,57 +1179,94 @@
       { id: 'ff_18', name: "Dunkin' Donuts Glazed Donut", name_en: "Dunkin' Donuts Glazed Donut", name_zh: "唐恩都乐糖霜甜甜圈", name_es: "Dunkin' Donuts Donut Glaseado", cat: 'fastfood', kh: 50.0, portion: 52, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
       { id: 'ff_19', name: "Dunkin' Donuts Boston Kreme", name_en: "Dunkin' Donuts Boston Kreme Donut", name_zh: "唐恩都乐波士顿奶油", name_es: "Dunkin' Donuts Boston Kreme", cat: 'fastfood', kh: 37.6, portion: 85, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
       { id: 'ff_20', name: "Dunkin' Donuts Strawberry Sprinkles", name_en: "Dunkin' Donuts Strawberry Sprinkles", name_zh: "唐恩都乐草莓彩针甜甜圈", name_es: "Dunkin' Donuts Fresa", cat: 'fastfood', kh: 54.0, portion: 65, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'ff_21', name: "Pizza Hut Pizza Salami (1 Slice)", name_en: "Pizza Hut Pepperoni Pizza (1 Slice)", name_zh: "必胜客萨拉米披萨 (1块)", name_es: "Pizza Hut Pizza de Salami (1 porción)", cat: 'fastfood', kh: 28.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ff_22', name: "Domino's Pizza Margherita (1 Slice)", name_en: "Domino's Margherita Pizza (1 Slice)", name_zh: "达美乐玛格丽特披萨 (1块)", name_es: "Domino's Pizza Margarita (1 porción)", cat: 'fastfood', kh: 30.0, portion: 95, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ff_23', name: "KFC Hot Wings (3 Stk.)", name_en: "KFC Hot Wings (3 pcs)", name_zh: "肯德基辣翅 (3个)", name_es: "KFC Alitas Picantes (3 uds.)", cat: 'fastfood', kh: 8.5, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ff_24', name: "KFC Crispy Strips (3 Stk.)", name_en: "KFC Crispy Strips (3 pcs)", name_zh: "肯德基香辣鸡条 (3条)", name_es: "KFC Tiras Crujientes (3 uds.)", cat: 'fastfood', kh: 12.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
 
       // --- WURST & FLEISCH ---
       { id: 'w_1', name: "Ungarische Salami", name_en: "Hungarian Salami", name_zh: "匈牙利萨拉米", name_es: "Salami Húngaro", cat: 'wurst', kh: 0.8, portion: 25, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
       { id: 'w_2', name: "Bierschinken / Fleischwurst", name_en: "Bologna Sausage", name_zh: "德式肉肠", name_es: "Mortadela alemana", cat: 'wurst', kh: 1.2, portion: 40, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
       { id: 'w_3', name: "Kochschinken", name_en: "Boiled Ham", name_zh: "熟火腿", name_es: "Jamón cocido", cat: 'wurst', kh: 0.5, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
       { id: 'w_4', name: "Schwarzwälder Schinken", name_en: "Black Forest Ham", name_zh: "黑森林火腿", name_es: "Jamón de la Selva Negra", cat: 'wurst', kh: 0.2, portion: 25, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_5', name: "Mettwurst / Zwiebelmettwurst", name_en: "Mettwurst Spread", name_zh: "洋葱肉肠酱", name_es: "Mettwurst", cat: 'wurst', kh: 1.0, portion: 30, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_6', name: "Wiener Würstchen / Frankfurter", name_en: "Wiener / Frankfurter", name_zh: "维也纳小香肠", name_es: "Salchichas Vienesas", cat: 'wurst', kh: 0.8, portion: 60, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_7', name: "Bockwurst", name_en: "Bockwurst", name_zh: "博克香肠", name_es: "Salchicha Bockwurst", cat: 'wurst', kh: 1.0, portion: 80, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_8', name: "Rindersteak gebraten", name_en: "Fried Beef Steak", name_zh: "煎牛排", name_es: "Bistec de ternera", cat: 'wurst', kh: 0.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_9', name: "Hähnchenbrustfilet gegrillt", name_en: "Grilled Chicken Breast", name_zh: "烤鸡胸肉", name_es: "Pechuga de pollo a la plancha", cat: 'wurst', kh: 0.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
-      { id: 'w_10', name: "Schweineschnitzel paniert", name_en: "Breaded Pork Schnitzel", name_zh: "炸猪排", name_es: "Escalope de cerdo empanado", cat: 'wurst', kh: 12.0, portion: 180, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'w_5', name: "Wiener Würstchen / Frankfurter", name_en: "Wiener / Frankfurter", name_zh: "维也纳小香肠", name_es: "Salchichas Vienesas", cat: 'wurst', kh: 0.8, portion: 60, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'w_6', name: "Rindersteak gebraten", name_en: "Fried Beef Steak", name_zh: "煎牛排", name_es: "Bistec de ternera", cat: 'wurst', kh: 0.0, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
 
       // --- SÜSSES & AUFSTRICHE ---
       { id: 's_1', name: "Nutella Nuss-Nougat-Creme", name_en: "Nutella Hazelnut Spread", name_zh: "能多益榛子酱", name_es: "Nutella Crema de Avellanas", cat: 'aufstriche', kh: 57.5, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
       { id: 's_2', name: "Milka Alpenmilch Schokolade", name_en: "Milka Alpine Milk Chocolate", name_zh: "妙卡牛奶巧克力", name_es: "Milka Chocolate con Leche", cat: 'aufstriche', kh: 59.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
       { id: 's_3', name: "Haribo Goldbären", name_en: "Haribo Goldbears Gummy Bears", name_zh: "哈瑞宝金熊小熊糖", name_es: "Haribo Ositos de Oro", cat: 'aufstriche', kh: 77.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_4', name: "Ritter Sport Edelnougat", name_en: "Ritter Sport Fine Nougat", name_zh: "瑞德斯堡榛果夹心", name_es: "Ritter Sport Nougat", cat: 'aufstriche', kh: 49.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_5', name: "Kinder Bueno Riegel", name_en: "Kinder Bueno Bar", name_zh: "健达缤纷乐", name_es: "Kinder Bueno", cat: 'aufstriche', kh: 49.5, portion: 43, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
-      { id: 's_6', name: "M&M's Choco Schokodragees", name_en: "M&M's Chocolate Candies", name_zh: "M&M's 巧克力豆", name_es: "M&M's Chocolate", cat: 'aufstriche', kh: 70.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_7', name: "Oreo Kakao-Doppelkeks", name_en: "Oreo Sandwich Cookies", name_zh: "奥利奥夹心饼干", name_es: "Galletas Oreo", cat: 'aufstriche', kh: 68.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_8', name: "Erdbeermarmelade / Konfitüre", name_en: "Strawberry Jam", name_zh: "草莓果酱", name_es: "Mermelada de Fresa", cat: 'aufstriche', kh: 60.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_9', name: "Blütenhonig / Bienenhonig", name_en: "Flower Honey", name_zh: "天然花蜜", name_es: "Miel de Flores", cat: 'aufstriche', kh: 82.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_10', name: "Kinderschokolade (Riegel)", name_en: "Kinder Chocolate Bar", name_zh: "健达巧克力条", name_es: "Barrita Kinder", cat: 'aufstriche', kh: 53.5, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
-      { id: 's_11', name: "Schokokuss / Schaumkuss", name_en: "Chocolate Marshmallow", name_zh: "巧克力棉花糖酥", name_es: "Besito de Chocolate", cat: 'aufstriche', kh: 62.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_12', name: "Ferrero Rocher Praline", name_en: "Ferrero Rocher", name_zh: "费列罗榛果威化", name_es: "Ferrero Rocher", cat: 'aufstriche', kh: 44.0, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 's_13', name: "Erdnussbutter (Peanut Butter)", name_en: "Peanut Butter", name_zh: "花生酱", name_es: "Mantequilla de Cacahuete", cat: 'aufstriche', kh: 16.0, portion: 20, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 's_4', name: "Kinder Bueno Riegel", name_en: "Kinder Bueno Bar", name_zh: "健达缤纷乐", name_es: "Kinder Bueno", cat: 'aufstriche', kh: 49.5, portion: 43, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_5', name: "Kinderschokolade (Riegel)", name_en: "Kinder Chocolate Bar", name_zh: "健达巧克力条", name_es: "Barrita Kinder", cat: 'aufstriche', kh: 53.5, portion: 25, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 's_6', name: "Erdbeermarmelade / Konfitüre", name_en: "Strawberry Jam", name_zh: "草莓果酱", name_es: "Mermelada de Fresa", cat: 'aufstriche', kh: 60.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
 
       // --- BROT & GETREIDE ---
       { id: 'b_1', name: "Weizenbrot / Weißbrot", name_en: "White Wheat Bread", name_zh: "白小麦面包", name_es: "Pan Blanco de Trigo", cat: 'brot', kh: 48.0, portion: 50, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'b_2', name: "Graubrot / Mischbrot", name_en: "Mixed Rye & Wheat Bread", name_zh: "混合黑麦小麦面包", name_es: "Pan Mezcla de Centeno y Trigo", cat: 'brot', kh: 45.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'b_3', name: "Vollkornbrot 100% Rye", name_en: "Whole Grain Bread", name_zh: "全麦黑麦面包", name_es: "Pan Integral de Centeno", cat: 'brot', kh: 39.0, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
-      { id: 'b_4', name: "Weizenbrötchen / Schrippe", name_en: "Wheat Roll / Bun", name_zh: "小麦小面包", name_es: "Panecillo Blanco", cat: 'brot', kh: 52.0, portion: 50, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
-      { id: 'b_5', name: "Laugenbrezel frisch", name_en: "German Pretzel", name_zh: "德国碱水结面包", name_es: "Pretzel Alemán", cat: 'brot', kh: 54.0, portion: 85, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'b_6', name: "Vollkorntoast", name_en: "Whole Wheat Toast Bread", name_zh: "全麦吐司", name_es: "Pan de Molde Integral", cat: 'brot', kh: 42.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'b_2', name: "Vollkornbrot 100% Rye", name_en: "Whole Grain Bread", name_zh: "全麦黑麦面包", name_es: "Pan Integral de Centeno", cat: 'brot', kh: 39.0, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
+      { id: 'b_3', name: "Weizenbrötchen / Schrippe", name_en: "Wheat Roll / Bun", name_zh: "小麦小面包", name_es: "Panecillo Blanco", cat: 'brot', kh: 52.0, portion: 50, unit: 'g', geschwindigkeit: 'schnell', isFavorite: true },
+      { id: 'b_4', name: "Laugenbrezel frisch", name_en: "German Pretzel", name_zh: "德国碱水结面包", name_es: "Pretzel Alemán", cat: 'brot', kh: 54.0, portion: 85, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
 
       // --- CEREALIEN ---
       { id: 'c_1', name: "Kölln Blütenzarte Haferflocken", name_en: "Kölln Rolled Oats", name_zh: "克林燕麦片", name_es: "Copos de Avena Kölln", cat: 'cerealien', kh: 58.7, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
       { id: 'c_2', name: "Klassische Cornflakes", name_en: "Classic Cornflakes", name_zh: "经典原味玉米片", name_es: "Copos de Maíz Clásicos", cat: 'cerealien', kh: 80.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'c_3', name: "Honig-Cornflakes", name_en: "Honey Cornflakes", name_zh: "蜂蜜玉米片", name_es: "Cornflakes con Miel", cat: 'cerealien', kh: 84.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'c_4', name: "Knusper-Schokomüsli", name_en: "Crunchy Chocolate Granola", name_zh: "脆巧克力麦片", name_es: "Muesli Crujiente de Chocolate", cat: 'cerealien', kh: 64.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
 
-      // --- OBST ---
+      // --- OBST (MASSIV ERWEITERT AUF 60+ SORTEN) ---
       { id: 'o_1', name: "Apfel frisch (mit Schale)", name_en: "Fresh Apple (with skin)", name_zh: "鲜苹果 (带皮)", name_es: "Manzana Fresca", cat: 'obst', kh: 11.0, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
       { id: 'o_2', name: "Banane frisch (ohne Schale)", name_en: "Fresh Banana (peeled)", name_zh: "鲜香蕉 (去皮)", name_es: "Plátano Fresco", cat: 'obst', kh: 20.0, portion: 110, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
       { id: 'o_3', name: "Erdbeeren frisch", name_en: "Fresh Strawberries", name_zh: "鲜草莓", name_es: "Fresas Frescas", cat: 'obst', kh: 5.5, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
       { id: 'o_4', name: "Kiwi grün frisch", name_en: "Green Kiwi", name_zh: "绿奇异果", name_es: "Kiwi Verde", cat: 'obst', kh: 9.1, portion: 80, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_5', name: "Himbeeren frisch", name_en: "Fresh Raspberries", name_zh: "新鲜树莓 / 覆盆子", name_es: "Frambuesas Frescas", cat: 'obst', kh: 4.8, portion: 125, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_6', name: "Blaubeeren / Heidelbeeren", name_en: "Blueberries", name_zh: "蓝莓", name_es: "Arándanos Azules", cat: 'obst', kh: 7.4, portion: 125, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
+      { id: 'o_7', name: "Brombeeren frisch", name_en: "Blackberries", name_zh: "黑莓", name_es: "Moras Frescas", cat: 'obst', kh: 5.1, portion: 125, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_8', name: "Süßkirschen frisch", name_en: "Sweet Cherries", name_zh: "甜樱桃 / 车厘子", name_es: "Cerezas Dulces", cat: 'obst', kh: 12.2, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_9', name: "Sauerkirschen frisch", name_en: "Sour Cherries", name_zh: "酸樱桃", name_es: "Guindas / Cerezas Ácidas", cat: 'obst', kh: 8.2, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_10', name: "Pflaumen frisch", name_en: "Fresh Plums", name_zh: "新鲜李子", name_es: "Ciruelas Frescas", cat: 'obst', kh: 10.2, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_11', name: "Zwetschgen frisch", name_en: "Damsons / Italian Prunes", name_zh: "西梅 / 德国小李子", name_es: "Ciruelas claudias / pasas", cat: 'obst', kh: 11.0, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_12', name: "Mirabellen frisch", name_en: "Mirabelle Plums", name_zh: "黄香李 / 密罗果", name_es: "Mirabeles", cat: 'obst', kh: 12.1, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_13', name: "Pfirsich frisch", name_en: "Fresh Peach", name_zh: "鲜桃子", name_es: "Melocotón Fresco", cat: 'obst', kh: 9.5, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_14', name: "Nektarine frisch", name_en: "Fresh Nectarine", name_zh: "油桃", name_es: "Nectarina Fresca", cat: 'obst', kh: 8.9, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_15', name: "Aprikose frisch", name_en: "Fresh Apricot", name_zh: "新鲜杏子", name_es: "Albaricoques Frescos", cat: 'obst', kh: 8.5, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_16', name: "Wassermelone frisch", name_en: "Watermelon", name_zh: "西瓜", name_es: "Sandía Fresca", cat: 'obst', kh: 6.2, portion: 200, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_17', name: "Honigmelone frisch", name_en: "Honeydew Melon", name_zh: "哈密瓜 / 蜜瓜", name_es: "Melón Melindro / Honydew", cat: 'obst', kh: 8.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_18', name: "Cantaloupe Melone", name_en: "Cantaloupe Melon", name_zh: "网纹甜瓜 / 卡antaloupe", name_es: "Melón Cantalupo", cat: 'obst', kh: 7.9, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_19', name: "Orange frisch", name_en: "Fresh Orange", name_zh: "鲜橙", name_es: "Naranja Fresca", cat: 'obst', kh: 8.3, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_20', name: "Mandarine / Clementine", name_en: "Mandarin / Clementine", name_zh: "柑橘 / 克里曼红橘", name_es: "Mandarina / Clementina", cat: 'obst', kh: 9.1, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_21', name: "Zitrone frisch", name_en: "Fresh Lemon", name_zh: "鲜柠檬", name_es: "Limón Fresco", cat: 'obst', kh: 3.2, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_22', name: "Grapefruit frisch", name_en: "Fresh Grapefruit", name_zh: "西柚 / 葡萄柚", name_es: "Pomelo Fresco", cat: 'obst', kh: 6.5, portion: 200, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_23', name: "Limette frisch", name_en: "Fresh Lime", name_zh: "青柠檬", name_es: "Lima Fresca", cat: 'obst', kh: 2.8, portion: 40, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_24', name: "Mango frisch", name_en: "Fresh Mango", name_zh: "鲜芒果", name_es: "Mango Fresco", cat: 'obst', kh: 12.8, portion: 200, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
+      { id: 'o_25', name: "Ananas frisch", name_en: "Fresh Pineapple", name_zh: "新鲜菠萝", name_es: "Piña Fresca", cat: 'obst', kh: 12.4, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_26', name: "Papaya frisch", name_en: "Fresh Papaya", name_zh: "番木瓜 / 木瓜", name_es: "Papaya Fresca", cat: 'obst', kh: 8.3, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_27', name: "Maracuja / Passionsfrucht", name_en: "Passion Fruit / Maracuja", name_zh: "百香果 / 西番莲", name_es: "Maracuyá / Fruta de la Pasión", cat: 'obst', kh: 9.3, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_28', name: "Granatapfelkerne frisch", name_en: "Pomegranate Seeds", name_zh: "石榴籽", name_es: "Granada (granos)", cat: 'obst', kh: 14.5, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_29', name: "Feigen frisch", name_en: "Fresh Figs", name_zh: "新鲜无花果", name_es: "Higos Frescos", cat: 'obst', kh: 12.5, portion: 80, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_30', name: "Datteln getrocknet", name_en: "Dried Dates", name_zh: "干枣 / 椰枣", name_es: "Dátiles Secos", cat: 'obst', kh: 65.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_31', name: "Feigen getrocknet", name_en: "Dried Figs", name_zh: "无花果干", name_es: "Higos Secos", cat: 'obst', kh: 48.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_32', name: "Rosinen / Sultaninen", name_en: "Raisins / Sultanas", name_zh: "葡萄干 / 苏丹果", name_es: "Pasas de Uva / Sultaninas", cat: 'obst', kh: 69.3, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_33', name: "Pflaumen getrocknet (Dörrpflaumen)", name_en: "Dried Prunes", name_zh: "西梅干 / 枣乾", name_es: "Ciruelas Pasas", cat: 'obst', kh: 38.0, portion: 40, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_34', name: "Aprikosen getrocknet", name_en: "Dried Apricots", name_zh: "杏干", name_es: "Albaricoques Secos (Orejones)", cat: 'obst', kh: 51.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_35', name: "Birne frisch", name_en: "Fresh Pear", name_zh: "鲜梨", name_es: "Pera Fresca", cat: 'obst', kh: 11.4, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_36', name: "Trauben hell / grün", name_en: "White / Green Grapes", name_zh: "白葡萄 / 绿提子", name_es: "Uvas Blancas / Verdes", cat: 'obst', kh: 15.2, portion: 125, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_37', name: "Trauben rot", name_en: "Red Grapes", name_zh: "红提 / 红葡萄", name_es: "Uvas Rojas", cat: 'obst', kh: 15.6, portion: 125, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_38', name: "Johannisbeeren rot", name_en: "Red Currants", name_zh: "红醋栗 / 红加仑", name_es: "Grosellas Rojas", cat: 'obst', kh: 5.5, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_39', name: "Johannisbeeren schwarz", name_en: "Black Currants", name_zh: "黑醋栗", name_es: "Grosellas Negras", cat: 'obst', kh: 6.5, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_40', name: "Stachelbeeren frisch", name_en: "Gooseberries", name_zh: "醋栗 / 鹅莓", name_es: "Grosellas Espinosas", cat: 'obst', kh: 7.5, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_41', name: "Preiselbeeren frisch", name_en: "Fresh Cranberries", name_zh: "鲜越橘 / 蔓越莓", name_es: "Arándanos Rojos Frescos", cat: 'obst', kh: 7.5, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_42', name: "Sanddornbeeren frisch", name_en: "Sea Buckthorn Berries", name_zh: "沙棘果", name_es: "Bayas de Espino Amarillo", cat: 'obst', kh: 2.8, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_43', name: "Kaki / Sharonfrucht", name_en: "Persimmon / Sharon Fruit", name_zh: "柿子 / 甜柿", name_es: "Caqui / Persimón", cat: 'obst', kh: 16.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_44', name: "Litschi frisch", name_en: "Fresh Lychee", name_zh: "新鲜荔枝", name_es: "Lichis Frescos", cat: 'obst', kh: 15.2, portion: 100, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_45', name: "Physalis / Kapstachelbeere", name_en: "Physalis / Cape Gooseberry", name_zh: "姑娘果 / 黄金莓", name_es: "Uchuva / Physalis", cat: 'obst', kh: 11.2, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_46', name: "Sternfrucht / Karambole", name_en: "Starfruit / Carambola", name_zh: "杨桃", name_es: "Carambola / Fruta Estreya", cat: 'obst', kh: 6.7, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_47', name: "Guave frisch", name_en: "Fresh Guava", name_zh: "番石榴 / 芭乐", name_es: "Guayaba Fresca", cat: 'obst', kh: 9.5, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_48', name: "Kumquat frisch", name_en: "Kumquat", name_zh: "金橘 / 金枣", name_es: "Kumquat / Naranjita China", cat: 'obst', kh: 15.9, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_49', name: "Cranberries getrocknet (gesüßt)", name_en: "Dried Sweetened Cranberries", name_zh: "糖渍蔓越莓干", name_es: "Arándanos Rojos Secos azucarados", cat: 'obst', kh: 72.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_50', name: "Bananenchips getrocknet", name_en: "Dried Banana Chips", name_zh: "香蕉干片", name_es: "Chips de Plátano Seco", cat: 'obst', kh: 58.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_51', name: "Holunderbeeren gekocht", name_en: "Elderberries cooked", name_zh: "煮熟接骨木莓", name_es: "Bayas de Saúco cocidas", cat: 'obst', kh: 7.0, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_52', name: "Nashi-Birne", name_en: "Nashi Pear", name_zh: "南果梨 / 沙梨", name_es: "Pera Nashi", cat: 'obst', kh: 9.0, portion: 180, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_53', name: "Pomelo frisch", name_en: "Pomelo", name_zh: "柚子 / 晚白柚", name_es: "Pomelo Chino / Pomelo real", cat: 'obst', kh: 8.5, portion: 200, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_54', name: "Kaktusfeige frisch", name_en: "Prickly Pear / Cactus Fruit", name_zh: "仙人掌果", name_es: "Higo Chumbo / Tuna", cat: 'obst', kh: 7.2, portion: 100, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_55', name: "Rhabarber frisch", name_en: "Fresh Rhubarb", name_zh: "大黄 / 食用大黄", name_es: "Ruibarbo Fresco", cat: 'obst', kh: 1.4, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'o_56', name: "Cantaloupe-Melone Stücke", name_en: "Cantaloupe Chunks", name_zh: "哈密瓜切块", name_es: "Trocitos de Cantalupo", cat: 'obst', kh: 7.9, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_57', name: "Hagebutten frisch", name_en: "Rose Hips fresh", name_zh: "玫瑰果", name_es: "Escaramujos frescos", cat: 'obst', kh: 21.0, portion: 50, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_58', name: "Maulbeeren getrocknet", name_en: "Dried Mulberries", name_zh: "干桑葚", name_es: "Moras Secas", cat: 'obst', kh: 70.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'o_59', name: "Goji-Beeren getrocknet", name_en: "Dried Goji Berries", name_zh: "枸杞干", name_es: "Bayas de Goji Secas", cat: 'obst', kh: 53.0, portion: 20, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
+      { id: 'o_60', name: "Physalis getrocknet", name_en: "Dried Physalis", name_zh: "姑娘果干", name_es: "Physalis Seco", cat: 'obst', kh: 50.0, portion: 30, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
 
       // --- GEMÜSE ---
       { id: 'g_1', name: "Karotten / Möhren frisch", name_en: "Fresh Carrots", name_zh: "新鲜胡萝卜", name_es: "Zanahorias Frescas", cat: 'gemuese', kh: 5.0, portion: 100, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
@@ -1241,30 +1279,21 @@
       { id: 'd_2', name: "Coca-Cola klassisch zuckergesüßt", name_en: "Classic Cola", name_zh: "经典可口可乐", name_es: "Coca-Cola Clásica", cat: 'getraenke', kh: 10.6, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: true },
       { id: 'd_3', name: "Coca-Cola Zero / Light", name_en: "Coca-Cola Zero", name_zh: "零度无糖可乐", name_es: "Coca-Cola Zero", cat: 'getraenke', kh: 0.0, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
       { id: 'd_4', name: "Spezi / Cola-Mix gesüßt", name_en: "Cola & Orange Soda Mix", name_zh: "可乐橙汁混合饮料", name_es: "Mezcla Cola y Naranja (Spezi)", cat: 'getraenke', kh: 10.2, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: true },
-      { id: 'd_5', name: "Orangensaft 100% Direktsaft", name_en: "100% Orange Juice", name_zh: "100%纯橙汁", name_es: "Zumo de Naranja 100%", cat: 'getraenke', kh: 9.1, portion: 200, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'd_6', name: "Red Bull Energy Drink", name_en: "Red Bull Energy Drink", name_zh: "红牛能量饮料", name_es: "Red Bull Energy Drink", cat: 'getraenke', kh: 11.0, portion: 250, unit: 'ml', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'd_7', name: "Pilsener / Helles Bier", name_en: "Lager / Pilsner Beer", name_zh: "皮尔森啤酒", name_es: "Cerveza Rubia / Pilsen", cat: 'getraenke', kh: 3.1, portion: 330, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
 
       // --- FERTIGGERICHTE & MAHLZEITEN ---
       { id: 'ma_1', name: "Dr. Oetker Pizza Ristorante Salami", name_en: "Dr. Oetker Pizza Ristorante Salami", name_zh: "欧特家萨拉米披萨", name_es: "Pizza Ristorante Salami Dr. Oetker", cat: 'gerichte', kh: 28.0, portion: 320, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
       { id: 'ma_2', name: "Pasta / Nudeln gekocht", name_en: "Cooked Pasta", name_zh: "煮熟意面", name_es: "Pasta Cocida", cat: 'gerichte', kh: 28.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ma_3', name: "Basmatireis gekocht", name_en: "Cooked Basmati Rice", name_zh: "熟香米饭", name_es: "Arroz Basmati Cocido", cat: 'gerichte', kh: 27.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ma_4', name: "Salzkartoffeln gekocht", name_en: "Boiled Potatoes", name_zh: "水煮土豆", name_es: "Patatas Cocidas", cat: 'gerichte', kh: 15.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ma_5', name: "Döner Kebab (Fladenbrot komplett)", name_en: "Doner Kebab in pita", name_zh: "土耳其烤肉夹馍", name_es: "Döner Kebab Completo", cat: 'gerichte', kh: 18.0, portion: 350, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ma_6', name: "Lasagne Bolognese (Tiefkühl / Fertiggericht)", name_en: "Lasagne Bolognese", name_zh: "意式肉酱千层面", name_es: "Lasaña Boloñesa", cat: 'gerichte', kh: 16.5, portion: 400, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
-      { id: 'ma_7', name: "Gemüseeintopf mit Kartoffeln", name_en: "Vegetable Stew with Potatoes", name_zh: "土耳其/德式蔬菜土豆浓汤", name_es: "Estofado de verduras con patatas", cat: 'gerichte', kh: 9.5, portion: 350, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'ma_3', name: "Salzkartoffeln gekocht", name_en: "Boiled Potatoes", name_zh: "水煮土豆", name_es: "Patatas Cocidas", cat: 'gerichte', kh: 15.0, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
 
       // --- EIS ---
       { id: 'ei_1', name: "Vanille-Milcheis", name_en: "Vanilla Milk Ice Cream", name_zh: "香草牛奶冰淇淋", name_es: "Helado de Vainilla", cat: 'eis', kh: 24.0, portion: 75, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'ei_2', name: "Schokoladeneis", name_en: "Chocolate Ice Cream", name_zh: "巧克力冰淇淋", name_es: "Helado de Chocolate", cat: 'eis', kh: 26.0, portion: 75, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
-      { id: 'ei_3', name: "Spaghetti-Eis Portion", name_en: "Spaghetti Ice Cream Portion", name_zh: "意面冰淇淋", name_es: "Spaghetti Eis", cat: 'eis', kh: 35.0, portion: 200, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false }
+      { id: 'ei_2', name: "Schokoladeneis", name_en: "Chocolate Ice Cream", name_zh: "巧克力冰淇淋", name_es: "Helado de Chocolate", cat: 'eis', kh: 26.0, portion: 75, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false }
     ];
 
     let foods = [];
     let currentCategory = 'all';
     let searchQuery = '';
     let currentEditingId = null;
-    let plate = [];
 
     let weekHistory = {};
     let currentWeekKey = '';
@@ -1661,6 +1690,7 @@
 
     window.addEventListener('DOMContentLoaded', () => {
       loadState();
+      loadPlateFromStorage();
       loadSavedPlates();
       loadWeekHistoryData();
       applyTheme();
@@ -1750,6 +1780,39 @@
       } catch(e) {}
     }
 
+    // --- PLATE PERSISTENCE (1 HOUR EXPIRATION / UNTIL TRANSFERRED) ---
+    function loadPlateFromStorage() {
+      try {
+        const savedPlate = localStorage.getItem('ke_plate');
+        const savedTime = localStorage.getItem('ke_plate_time');
+        if (savedPlate && savedTime) {
+          const elapsed = Date.now() - parseInt(savedTime, 10);
+          if (elapsed < 3600000) {
+            plate = JSON.parse(savedPlate);
+            if (!Array.isArray(plate)) plate = [];
+          } else {
+            plate = [];
+            localStorage.removeItem('ke_plate');
+            localStorage.removeItem('ke_plate_time');
+          }
+        }
+      } catch(e) {
+        plate = [];
+      }
+    }
+
+    function savePlateToStorage() {
+      try {
+        if (plate.length > 0) {
+          localStorage.setItem('ke_plate', JSON.stringify(plate));
+          localStorage.setItem('ke_plate_time', Date.now().toString());
+        } else {
+          localStorage.removeItem('ke_plate');
+          localStorage.removeItem('ke_plate_time');
+        }
+      } catch(e) {}
+    }
+
     // --- TELLERFAVORITEN LOGIC ---
     function loadSavedPlates() {
       try {
@@ -1803,6 +1866,7 @@
       if (!fav) return;
 
       plate = JSON.parse(JSON.stringify(fav.items));
+      savePlateToStorage();
       renderPlate();
       updateCockpit();
       switchTab('tab-plate');
@@ -2253,6 +2317,11 @@
       renderDaysPlan();
       closeTransferModal();
 
+      plate = [];
+      savePlateToStorage();
+      renderPlate();
+      updateCockpit();
+
       switchTab('tab-plan');
     }
 
@@ -2362,7 +2431,7 @@
         document.getElementById('del-tutorial-modal').classList.remove('hidden');
         lucide.createIcons();
       } else {
-        confirmAndDeleteFood(foodId);
+        confirmAndDeleteFood(pendingDeleteFoodId);
       }
     }
 
@@ -2463,6 +2532,7 @@
           geschwindigkeit: food.geschwindigkeit || 'mittel'
         });
       }
+      savePlateToStorage();
       renderPlate();
       updateCockpit();
     }
@@ -2557,6 +2627,7 @@
       const calcLabel = document.getElementById(`label-item-calc-${index}`);
       if (calcLabel) calcLabel.textContent = `${itemKH}g ${t('lblKh')} (${itemKE} KE)`;
 
+      savePlateToStorage();
       updateCockpit();
     }
 
@@ -2579,6 +2650,7 @@
 
     function removePlateItem(index) {
       plate.splice(index, 1);
+      savePlateToStorage();
       renderPlate();
       updateCockpit();
     }
@@ -2597,6 +2669,7 @@
       }
 
       plate = [];
+      savePlateToStorage();
       renderPlate();
       updateCockpit();
     }
@@ -2713,7 +2786,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'ke-rechner-intl-v49';
+        const CACHE_NAME = 'ke-rechner-intl-v50';
         self.addEventListener('install', e => self.skipWaiting());
         self.addEventListener('activate', e => self.clients.claim());
         self.addEventListener('fetch', e => {
