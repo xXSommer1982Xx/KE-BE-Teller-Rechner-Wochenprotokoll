@@ -938,7 +938,7 @@
           {
             icon: "trash-2",
             title: "3. 删除食物",
-            desc: "长按任意自创或扫描的食物1秒钟即可将其从数据库中删除。"
+            desc: "长按任意自创或扫描的食物1秒钟即可将其从列表中删除。"
           },
           {
             icon: "calendar",
@@ -1089,7 +1089,7 @@
         { id: 'aufstriche', name: '🍫 Süßes & Aufstriche' },
         { id: 'brot', name: '🍞 Brot & Getreide' },
         { id: 'cerealien', name: '🥣 Cerealien' },
-        { id: 'obst', name: '🍎 Obst (60+)' },
+        { id: 'obst', name: '🍎 Obst' },
         { id: 'gemuese', name: '🥦 Gemüse' },
         { id: 'getraenke', name: '🥤 Getränke' },
         { id: 'gerichte', name: '🍕 Fertiggerichte' },
@@ -1104,7 +1104,7 @@
         { id: 'aufstriche', name: '🍫 Sweets & Spreads' },
         { id: 'brot', name: '🍞 Bread & Grains' },
         { id: 'cerealien', name: '🥣 Cereals' },
-        { id: 'obst', name: '🍎 Fruit (60+)' },
+        { id: 'obst', name: '🍎 Fruit' },
         { id: 'gemuese', name: '🥦 Vegetables' },
         { id: 'getraenke', name: '🥤 Drinks' },
         { id: 'gerichte', name: '🍕 Ready Meals' },
@@ -1119,7 +1119,7 @@
         { id: 'aufstriche', name: '🍫 甜品与酱料' },
         { id: 'brot', name: '🍞 面包烘焙' },
         { id: 'cerealien', name: '🥣 谷物麦片' },
-        { id: 'obst', name: '🍎 水果 (60+)' },
+        { id: 'obst', name: '🍎 水果' },
         { id: 'gemuese', name: '🥦 蔬菜豆类' },
         { id: 'getraenke', name: '🥤 饮品' },
         { id: 'gerichte', name: '🍕 预制正餐' },
@@ -1134,7 +1134,7 @@
         { id: 'aufstriche', name: '🍫 Dulces y Untables' },
         { id: 'brot', name: '🍞 Panadería' },
         { id: 'cerealien', name: '🥣 Cereales' },
-        { id: 'obst', name: '🍎 Frutas (60+)' },
+        { id: 'obst', name: '🍎 Frutas' },
         { id: 'gemuese', name: '🥦 Verduras' },
         { id: 'getraenke', name: '🥤 Bebidas' },
         { id: 'gerichte', name: '🍕 Platos Preparados' },
@@ -1206,7 +1206,7 @@
       { id: 'c_1', name: "Kölln Blütenzarte Haferflocken", name_en: "Kölln Rolled Oats", name_zh: "克林燕麦片", name_es: "Copos de Avena Kölln", cat: 'cerealien', kh: 58.7, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: true },
       { id: 'c_2', name: "Klassische Cornflakes", name_en: "Classic Cornflakes", name_zh: "经典原味玉米片", name_es: "Copos de Maíz Clásicos", cat: 'cerealien', kh: 80.0, portion: 40, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
 
-      // --- OBST (MASSIV ERWEITERT AUF 60+ SORTEN) ---
+      // --- OBST (60+ SORTEN) ---
       { id: 'o_1', name: "Apfel frisch (mit Schale)", name_en: "Fresh Apple (with skin)", name_zh: "鲜苹果 (带皮)", name_es: "Manzana Fresca", cat: 'obst', kh: 11.0, portion: 90, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
       { id: 'o_2', name: "Banane frisch (ohne Schale)", name_en: "Fresh Banana (peeled)", name_zh: "鲜香蕉 (去皮)", name_es: "Plátano Fresco", cat: 'obst', kh: 20.0, portion: 110, unit: 'g', geschwindigkeit: 'mittel', isFavorite: false },
       { id: 'o_3', name: "Erdbeeren frisch", name_en: "Fresh Strawberries", name_zh: "鲜草莓", name_es: "Fresas Frescas", cat: 'obst', kh: 5.5, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
@@ -1730,11 +1730,12 @@
         savedFoods = null;
       }
 
+      const defaultMap = new Map(DEFAULT_FOODS.map(f => [f.id, f]));
+
       if (savedFoods) {
         try {
           const parsed = JSON.parse(savedFoods);
           if (Array.isArray(parsed) && parsed.length > 20) {
-            const defaultMap = new Map(DEFAULT_FOODS.map(f => [f.id, f]));
             foods = parsed.map(f => {
               const def = defaultMap.get(f.id);
               if (def) {
@@ -1750,16 +1751,24 @@
               }
               return { ...f, geschwindigkeit: f.geschwindigkeit || 'mittel', isFavorite: !!f.isFavorite };
             });
+
+            // WICHTIG: Neue Standard-Lebensmittel (wie die 60+ Obstsorten) automatisch ergänzen, falls sie fehlen!
+            DEFAULT_FOODS.forEach(defFood => {
+              if (!foods.some(f => f.id === defFood.id)) {
+                foods.push(defFood);
+              }
+            });
+
             saveFoods();
           } else {
-            foods = DEFAULT_FOODS;
+            foods = JSON.parse(JSON.stringify(DEFAULT_FOODS));
             saveFoods();
           }
         } catch(e) {
-          foods = DEFAULT_FOODS;
+          foods = JSON.parse(JSON.stringify(DEFAULT_FOODS));
         }
       } else {
-        foods = DEFAULT_FOODS;
+        foods = JSON.parse(JSON.stringify(DEFAULT_FOODS));
         saveFoods();
       }
 
