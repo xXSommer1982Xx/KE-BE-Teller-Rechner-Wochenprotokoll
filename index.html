@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>KE/BE Teller-Rechner & Wochenprotokoll v2.2.2</title>
+  <title>KE/BE Teller-Rechner & Wochenprotokoll v2.2.4</title>
   
   <!-- PWA & Mobile Meta Tags -->
-  <link rel="manifest" href='data:application/manifest+json,{"name":"KE/BE Rechner & Protokoll v2.2.2","short_name":"KE-Rechner","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#ffffff","orientation":"portrait","icons":[{"src":"data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"22\" fill=\"%234f46e5\"/><text x=\"50\" y=\"58\" font-family=\"sans-serif\" font-size=\"26\" font-weight=\"bold\" fill=\"white\" text-anchor=\"middle\">KE</text></svg>","sizes":"192x192 512x512","type":"image/svg+xml"}]}'>
+  <link rel="manifest" href='data:application/manifest+json,{"name":"KE/BE Rechner & Protokoll v2.2.4","short_name":"KE-Rechner","start_url":".","display":"standalone","background_color":"#f8fafc","theme_color":"#ffffff","orientation":"portrait","icons":[{"src":"data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" rx=\"22\" fill=\"%234f46e5\"/><text x=\"50\" y=\"58\" font-family=\"sans-serif\" font-size=\"26\" font-weight=\"bold\" fill=\"white\" text-anchor=\"middle\">KE</text></svg>","sizes":"192x192 512x512","type":"image/svg+xml"}]}'>
   <meta name="theme-color" content="#ffffff" id="meta-theme-color">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="KE-Rechner v2.2.2">
+  <meta name="apple-mobile-web-app-title" content="KE-Rechner v2.2.4">
 
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -100,7 +100,7 @@
         <i data-lucide="scale" class="w-4 h-4"></i>
       </div>
       <div>
-        <h1 id="ui-app-title" class="text-xs font-extrabold tracking-tight text-slate-900 dark:text-white uppercase leading-none">KE/BE Rechner v2.2.2</h1>
+        <h1 id="ui-app-title" class="text-xs font-extrabold tracking-tight text-slate-900 dark:text-white uppercase leading-none">KE/BE Rechner v2.2.4</h1>
         <span id="ui-app-sub" class="text-[10px] text-slate-400 dark:text-slate-500 font-medium">Mit Wochenprotokoll & OFF-Datenbank</span>
       </div>
     </div>
@@ -515,14 +515,14 @@
       <div class="overflow-y-auto custom-scroll flex flex-col gap-3 pr-1 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
         <div class="flex items-center justify-between bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200 dark:border-slate-700">
           <span class="font-bold text-slate-800 dark:text-slate-100" id="ui-about-appname">KE/BE Teller-Rechner & Wochenprotokoll</span>
-          <span class="text-[10px] font-mono-num font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">v2.2.2 PWA</span>
+          <span class="text-[10px] font-mono-num font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950 px-2 py-0.5 rounded-lg border border-indigo-200 dark:border-indigo-800">v2.2.4 PWA</span>
         </div>
 
         <p id="ui-about-desc">Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung, Blutzuckerdokumentation und Tellerfavoriten-Verwaltung.</p>
 
         <div>
           <span class="font-bold text-slate-800 dark:text-slate-100 block mb-1" id="ui-about-features-lbl">Hauptfunktionen:</span>
-          <p id="ui-about-features">Umfassende OFF-Datenbank mit Markenprodukten, Fastfood, erweiterter ALDI & Lidl Brottheke / Backshop Auswahl, 60+ Obstsorten, Favoriten an 2. Stelle, Tellerfavoriten und fortlaufendem Wochenprotokoll.</p>
+          <p id="ui-about-features">Umfassende OFF-Datenbank mit Markenprodukten, Fastfood, erweiterter ALDI & Lidl Brottheke / Backshop Auswahl, 60+ Obstsorten, neuer Soßen & Dips Kategorie, Favoriten an 2. Stelle, Tellerfavoriten und fortlaufendem Wochenprotokoll.</p>
         </div>
 
         <div>
@@ -544,13 +544,14 @@
           <p id="ui-about-disclaimer" class="leading-snug">Diese App dient ausschließlich zu Informations- und Dokumentationszwecken und ersetzt keine professionelle medizinische Beratung, Diagnose oder Behandlung durch einen Arzt oder Diabetesberater. Berechnungen für Insulin (Bolus/Basal) und Kohlenhydrate müssen stets eigenverantwortlich geprüft werden. Der Entwickler übernimmt keine Haftung für Therapieentscheidungen oder gesundheitliche Schäden.</p>
         </div>
 
-        <!-- Spenden-Button / Support-Hinweis -->
-        <div class="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 text-center flex flex-col gap-2 mt-3">
-          <span class="text-[11px] font-bold text-indigo-900 dark:text-indigo-200">
-            Gefällt dir die App? ☕
+        <!-- Freiwillige Unterstützung / Kaffeekasse -->
+        <div class="p-3 rounded-2xl bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/60 flex flex-col gap-2">
+          <span class="font-bold uppercase tracking-wide text-[10px] text-indigo-900 dark:text-indigo-200 flex items-center gap-1">
+            <i data-lucide="coffee" class="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 shrink-0"></i>
+            <span>Freiwillige Kaffeekasse</span>
           </span>
-          <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-snug">
-            Diese App ist und bleibt kostenlos und werbefrei. Wenn sie dir im Alltag hilft, kannst du die Weiterentwicklung gerne unterstützen!
+          <p class="text-[11px] leading-snug text-slate-600 dark:text-slate-300">
+            Die App ist und bleibt komplett kostenlos und werbefrei. Wenn sie dir im Alltag hilft, freue ich mich über einen kleinen Kaffeekassen-Beitrag zur Unterstützung der Weiterentwicklung (Hinweis: Keine steuerlich absetzbare Spende).
           </p>
           <a href="https://paypal.me/Sommer1982" target="_blank" rel="noopener noreferrer" class="mt-1 inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-xs">
             <i data-lucide="heart" class="w-3.5 h-3.5"></i>
@@ -606,7 +607,7 @@
 
     const I18N = {
       de: {
-        appTitle: "KE/BE Rechner v2.2.2",
+        appTitle: "KE/BE Rechner v2.2.4",
         appSub: "Mit Wochenprotokoll & OFF-Datenbank",
         tabDb: "Datenbank",
         tabPlate: "Teller",
@@ -688,7 +689,7 @@
         aboutAppName: "KE/BE Teller-Rechner & Wochenprotokoll",
         aboutDesc: "Der KE/BE Teller-Rechner & Wochenprotokoll unterstützt Menschen mit Diabetes bei der täglichen Kohlenhydratberechnung und Blutzuckerdokumentation.",
         aboutFeaturesLbl: "Hauptfunktionen:",
-        aboutFeatures: "Umfassende OFF-Datenbank mit Markenprodukten, Fastfood, erweiterter ALDI & Lidl Brottheke / Backshop Auswahl, 60+ Obstsorten, Favoriten an 2. Stelle, Tellerfavoriten und Wochenprotokoll.",
+        aboutFeatures: "Umfassende OFF-Datenbank mit Markenprodukten, Fastfood, erweiterter ALDI & Lidl Brottheke / Backshop Auswahl, 60+ Obstsorten, neue Soßen & Dips Kategorie, Favoriten an 2. Stelle, Tellerfavoriten und Wochenprotokoll.",
         aboutSourcesLbl: "Datenquellen & Lizenzen:",
         aboutSources: "Produktdaten & Barcodes: Bereitgestellt durch Open Food Facts (Community-Datenbank). Lizenziert unter der Open Database License (ODbL).",
         aboutPrivacyLbl: "Datenschutz:",
@@ -703,7 +704,7 @@
           {
             icon: "book-open",
             title: "1. Datenbank & Favoriten",
-            desc: "Durchsuche hunderte Lebensmittel, ALDI & Lidl Brottheke Backshop & 60+ Obstsorten. Markiere Favoriten mit dem Stern, um sie direkt in der 2. Kategorie zu finden."
+            desc: "Durchsuche hunderte Lebensmittel, Soßen & Dips, ALDI & Lidl Brottheke Backshop & 60+ Obstsorten. Markiere Favoriten mit dem Stern, um sie direkt in der 2. Kategorie zu finden."
           },
           {
             icon: "utensils",
@@ -726,7 +727,7 @@
         onbFinish: "Loslegen"
       },
       en: {
-        appTitle: "Carb Calculator v2.2.2",
+        appTitle: "Carb Calculator v2.2.4",
         appSub: "With Weekly Log & OFF Database",
         tabDb: "Database",
         tabPlate: "Plate",
@@ -808,7 +809,7 @@
         aboutAppName: "Carb Calculator & Weekly Log",
         aboutDesc: "The Carb Calculator & Weekly Log helps people with diabetes with daily carbohydrate counting and blood glucose documentation.",
         aboutFeaturesLbl: "Key Features:",
-        aboutFeatures: "Expanded OFF database with clean brand items, bakery shop items (ALDI & Lidl), barcode scanner, fast food, extended fruit category (60+ fruits), favorites quick access, saved plate favorites, weekly log.",
+        aboutFeatures: "Expanded OFF database with clean brand items, bakery shop items (ALDI & Lidl), sauces & dips category, barcode scanner, fast food, extended fruit category (60+ fruits), favorites quick access, saved plate favorites, weekly log.",
         aboutSourcesLbl: "Data Sources & Licenses:",
         aboutSources: "Product data & barcodes: Provided by Open Food Facts (community database). Licensed under the Open Database License (ODbL).",
         aboutPrivacyLbl: "Privacy:",
@@ -823,7 +824,7 @@
           {
             icon: "book-open",
             title: "1. Database & Favorites",
-            desc: "Browse hundreds of items including bakery shop (ALDI & Lidl) & 60+ fruits. Star favorites to find them instantly in the 2nd category."
+            desc: "Browse hundreds of items including sauces & dips, bakery shop (ALDI & Lidl) & 60+ fruits. Star favorites to find them instantly in the 2nd category."
           },
           {
             icon: "utensils",
@@ -846,7 +847,7 @@
         onbFinish: "Get Started"
       },
       zh: {
-        appTitle: "碳水计算器 v2.2.2",
+        appTitle: "碳水计算器 v2.2.4",
         appSub: "带周日志与OFF数据库",
         tabDb: "数据库",
         tabPlate: "餐盘",
@@ -928,7 +929,7 @@
         aboutAppName: "碳水计算器与周日志",
         aboutDesc: "碳水计算器与周日志旨在帮助糖尿病患者进行日常碳水化合物计算和血糖记录。",
         aboutFeaturesLbl: "主要功能：",
-        aboutFeatures: "包含精选知名品牌、快餐、德国超市（ALDI与Lidl）烘焙面包房精选、60+种水果分类（含浆果、热带水果与干果）、收藏夹、餐盘收藏、周日志的OFF数据库。",
+        aboutFeatures: "包含精选知名品牌、快餐、酱料与蘸料分类、德国超市（ALDI与Lidl）烘焙面包房精选、60+种水果分类（含浆果、热带水果与干果）、收藏夹、餐盘收藏、周日志的OFF数据库。",
         aboutSourcesLbl: "数据来源与许可：",
         aboutSources: "产品数据与条形码：由 Open Food Facts（社区数据库）提供。依据 Open Database License (ODbL) 授权许可。",
         aboutPrivacyLbl: "隐私政策：",
@@ -943,7 +944,7 @@
           {
             icon: "book-open",
             title: "1. 数据库与收藏夹",
-            desc: "浏览上百种食物、超市烘焙食品（ALDI & Lidl）与60+种水果。点击星标收藏喜欢的食物，即可在第2个分类快速找到。"
+            desc: "浏览上百种食物、酱料蘸料、超市烘焙食品（ALDI & Lidl）与60+种水果。点击星标收藏喜欢的食物，即可在第2个分类快速找到。"
           },
           {
             icon: "utensils",
@@ -966,7 +967,7 @@
         onbFinish: "开始使用"
       },
       es: {
-        appTitle: "Calculadora v2.2.2",
+        appTitle: "Calculadora v2.2.4",
         appSub: "Con registro semanal y base OFF",
         tabDb: "Base de datos",
         tabPlate: "Plato",
@@ -1048,7 +1049,7 @@
         aboutAppName: "Calculadora de Raciones y Registro Semanal",
         aboutDesc: "La Calculadora de Raciones y Registro Semanal ayuda a las personas con diabetes en el cálculo diario de carbohidratos y el registro de glucemia.",
         aboutFeaturesLbl: "Características principales:",
-        aboutFeatures: "Base de datos OFF con productos de marca, fast food, panadería de supermercado (ALDI y Lidl), categoría de fruta ampliada (60+ frutas, bayas y frutos secos), favoritos, platos favoritos guardados, registro semanal.",
+        aboutFeatures: "Base de datos OFF con productos de marca, fast food, categoría de soßen & dips, panadería de supermercado (ALDI y Lidl), categoría de fruta ampliada (60+ frutas), favoritos, platos favoritos guardados, registro semanal.",
         aboutSourcesLbl: "Fuentes de datos y licencias:",
         aboutSources: "Datos y códigos de barras: Proporcionados por Open Food Facts (comunidad). Licenciados bajo ODbL.",
         aboutPrivacyLbl: "Privacidad:",
@@ -1063,7 +1064,7 @@
           {
             icon: "book-open",
             title: "1. Base de datos y Favoritos",
-            desc: "Explora cientos de alimentos, panadería de supermercado (ALDI & Lidl) y 60+ frutas. Marca favoritos para encontrarlos al instante en la 2ª categoría."
+            desc: "Explora cientos de alimentos, soßen y dips, panadería de supermercado (ALDI & Lidl) y 60+ frutas. Marca favoritos para encontrarlos al instante en la 2ª categoría."
           },
           {
             icon: "utensils",
@@ -1098,6 +1099,7 @@
       de: [
         { id: 'all', name: 'Alle' },
         { id: 'favoriten', name: '⭐ Favoriten' },
+        { id: 'sossen', name: '🍅 Soßen & Dips' },
         { id: 'milch', name: '🥛 Milch & Käse' },
         { id: 'fastfood', name: '🍔 Fastfood' },
         { id: 'wurst', name: '🥓 Wurst & Fleisch' },
@@ -1113,6 +1115,7 @@
       en: [
         { id: 'all', name: 'All' },
         { id: 'favoriten', name: '⭐ Favorites' },
+        { id: 'sossen', name: '🍅 Sauces & Dips' },
         { id: 'milch', name: '🥛 Dairy & Cheese' },
         { id: 'fastfood', name: '🍔 Fastfood' },
         { id: 'wurst', name: '🥓 Cold Cuts & Meat' },
@@ -1128,6 +1131,7 @@
       zh: [
         { id: 'all', name: '全部' },
         { id: 'favoriten', name: '⭐ 收藏夹' },
+        { id: 'sossen', name: '🍅 酱料与蘸料' },
         { id: 'milch', name: '🥛 奶制品乳酪' },
         { id: 'fastfood', name: '🍔 快餐' },
         { id: 'wurst', name: '🥓 肉制品与肉类' },
@@ -1143,6 +1147,7 @@
       es: [
         { id: 'all', name: 'Todos' },
         { id: 'favoriten', name: '⭐ Favoritos' },
+        { id: 'sossen', name: '🍅 Salsas y Aderezos' },
         { id: 'milch', name: '🥛 Lácteos y Quesos' },
         { id: 'fastfood', name: '🍔 Fastfood' },
         { id: 'wurst', name: '🥓 Embutidos y Carne' },
@@ -1160,6 +1165,15 @@
     const SLOTS_DEF = ['1', '2', '3', '4', '5', '6', '7'];
 
     const DEFAULT_FOODS = [
+      // --- SOẞEN & DIPS ---
+      { id: 'sos_1', name: "Tomatensoße (klassisch)", name_en: "Classic Tomato Sauce", name_zh: "经典番茄酱/意面酱", name_es: "Salsa de Tomate Clásica", cat: 'sossen', kh: 4.5, portion: 150, unit: 'g', geschwindigkeit: 'mittel', isFavorite: true },
+      { id: 'sos_2', name: "Bolognese-Soße mit Fleisch", name_en: "Meat Bolognese Sauce", name_zh: "肉酱博洛尼亚面酱", name_es: "Salsa Boloñesa con Carne", cat: 'sossen', kh: 5.2, portion: 150, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'sos_3', name: "Tomatenketchup", name_en: "Tomato Ketchup", name_zh: "番茄酱沙司", name_es: "Ketchup de Tomate", cat: 'sossen', kh: 25.0, portion: 20, unit: 'g', geschwindigkeit: 'schnell', isFavorite: false },
+      { id: 'sos_4', name: "Mayonnaise 80% Fett", name_en: "Mayonnaise 80% Fat", name_zh: "80% 脂肪蛋黄酱", name_es: "Mayonesa 80% Grasa", cat: 'sossen', kh: 1.5, portion: 20, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'sos_5', name: "Zaziki mit Quark & Gurke", name_en: "Tatziki / Tzatziki", name_zh: "希腊黄瓜酸奶酱", name_es: "Tzatziki", cat: 'sossen', kh: 3.8, portion: 50, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'sos_6', name: "Kräuterbutter", name_en: "Herb Butter", name_zh: "香草黄油", name_es: "Mantequilla de Hierbas", cat: 'sossen', kh: 0.8, portion: 20, unit: 'g', geschwindigkeit: 'langsam', isFavorite: false },
+      { id: 'sos_7', name: "Sojasoße", name_en: "Soy Sauce", name_zh: "酱油 / 生抽", name_es: "Salsa de Soja", cat: 'sossen', kh: 4.9, portion: 15, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
+
       // --- MILCH & KÄSE ---
       { id: 'm_1', name: "Vollmilch 3.5% Fett", name_en: "Whole Milk 3.5%", name_zh: "全脂牛奶 3.5%", name_es: "Leche Entera 3.5%", cat: 'milch', kh: 4.8, portion: 200, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
       { id: 'm_2', name: "Fettarme Milch 1.5%", name_en: "Low-fat Milk 1.5%", name_zh: "低脂牛奶 1.5%", name_es: "Leche Semidesnatada 1.5%", cat: 'milch', kh: 4.9, portion: 200, unit: 'ml', geschwindigkeit: 'mittel', isFavorite: false },
@@ -1400,7 +1414,7 @@
       
       try {
         const response = await fetch(url, {
-          headers: { 'User-Agent': 'KeBeRechnerTestApp/2.2' }
+          headers: { 'User-Agent': 'KeBeRechnerTestApp/2.4' }
         });
         const data = await response.json();
 
@@ -1413,7 +1427,7 @@
             id: 'off_' + barcode,
             barcode: barcode,
             name: name,
-            cat: 'fastfood',
+            cat: 'sossen',
             unit: 'g',
             kh: carbs,
             portion: 100,
@@ -2771,7 +2785,7 @@
       } else {
         document.getElementById('modal-title').textContent = t('modalNewTitle');
         document.getElementById('modal-name').value = '';
-        document.getElementById('modal-category').value = 'fastfood';
+        document.getElementById('modal-category').value = 'sossen';
         document.getElementById('modal-unit').value = 'g';
         document.getElementById('modal-kh').value = '';
         document.getElementById('modal-portion').value = '100';
@@ -2841,7 +2855,7 @@
   <script>
     if ('serviceWorker' in navigator) {
       const swCode = `
-        const CACHE_NAME = 'ke-rechner-intl-v222';
+        const CACHE_NAME = 'ke-rechner-intl-v224';
         self.addEventListener('install', e => self.skipWaiting());
         self.addEventListener('activate', e => self.clients.claim());
         self.addEventListener('fetch', e => {
